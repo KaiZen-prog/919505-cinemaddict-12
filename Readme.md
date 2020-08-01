@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Николай Карнаев](https://up.htmlacademy.ru/ecmascript/12/user/919505).
-* Наставник: `Неизвестно`.
+* Наставник: [Святослав Родионов](https://htmlacademy.ru/profile/rodionsv).
 
 ---
 
