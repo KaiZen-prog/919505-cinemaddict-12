@@ -24,28 +24,28 @@ render(INDEX_MAIN, createMainMenuTemplate(), `beforeend`);
 render(INDEX_MAIN, createSortTemplate(), `beforeend`);
 render(INDEX_MAIN, createMainSection(), `beforeend`);
 
-let filmsList = INDEX_MAIN.querySelector(`.films-list`);
+const filmsList = INDEX_MAIN.querySelector(`.films-list`);
 render(filmsList, createCardsContainer(), `beforeend`);
 render(filmsList, createShowMoreButton(), `beforeend`);
 
-let filmCardsContainer = filmsList.querySelector(`.films-list__container`);
+const filmCardsContainer = filmsList.querySelector(`.films-list__container`);
 for (let i = 0; i < COMMON_CARDS_COUNT; i++) {
   render(filmCardsContainer, createCard(), `beforeend`);
 }
 
-let filmsSection = INDEX_MAIN.querySelector(`.films`);
+const filmsSection = INDEX_MAIN.querySelector(`.films`);
 render(filmsSection, createTopSection(), `beforeend`);
 render(filmsSection, createMostCommentedSection(), `beforeend`);
 
-let extraFilmSectionCollection = filmsSection.querySelectorAll(`.films-list--extra`);
+const extraFilmSectionCollection = filmsSection.querySelectorAll(`.films-list--extra`);
 extraFilmSectionCollection.forEach(function (el) {
   render(el, createCardsContainer(), `beforeend`);
-  let container = el.querySelector(`.films-list__container`);
+  const container = el.querySelector(`.films-list__container`);
 
   for (let i = 0; i < EXTRA_CARDS_COUNT; i++) {
     render(container, createExtraCard(), `beforeend`);
   }
 });
 
-let statisticsSection = document.querySelector(`.footer__statistics`);
+const statisticsSection = document.querySelector(`.footer__statistics`);
 render(statisticsSection, createStatistics(), `beforeend`);
