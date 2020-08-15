@@ -1,27 +1,11 @@
-//import {isTaskExpired, isTaskRepeating, isTaskExpiringToday} from "../utils.js";
+import {FILTER_ENTRIES} from '../const.js';
 
-const sort = {
-  byDate: (films) => tasks.filter((task) => !task.isArchive).length,
-  overdue: (tasks) => tasks
-    .filter((task) => !task.isArchive)
-    .filter((task) => isTaskExpired(task.dueDate)).length,
-  today: (tasks) => tasks
-    .filter((task) => !task.isArchive)
-    .filter((task) => isTaskExpiringToday(task.dueDate)).length,
-  favorites: (tasks) => tasks
-    .filter((task) => !task.isArchive)
-    .filter((task) => task.isFavorite).length,
-  repeating: (tasks) => tasks
-    .filter((task) => !task.isArchive)
-    .filter((task) => isTaskRepeating(task.repeating)).length,
-  archive: (tasks) => tasks.filter((task) => task.isArchive).length,
-};
+export const generateFilter = (films) => {
+  let filters = {};
+  filters[FILTER_ENTRIES[0]] = films.length;
+  filters[FILTER_ENTRIES[1]] = films.filter((film) => film.inWatchlist).length;
+  filters[FILTER_ENTRIES[2]] = films.filter((film) => film.isWatched).length;
+  filters[FILTER_ENTRIES[3]] = films.filter((film) => film.isFavorite).length;
 
-export const sortCards = (films) => {
-  return Object.entries(taskToFilterMap).map(([filterName, countTasks]) => {
-    return {
-      name: filterName,
-      count: countTasks(tasks),
-    };
-  });
+  return filters;
 };
