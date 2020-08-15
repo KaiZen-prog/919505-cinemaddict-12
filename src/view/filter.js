@@ -1,43 +1,24 @@
+import {FILTER_ENTRIES} from '../const.js';
+
 const toggleClassName = (string) =>
-  string === `Sort by default`
+  string === FILTER_ENTRIES[0]
     ? ` main-navigation__item--active`
     : ``;
-/*
-const getFilmNumbers = (string, filter) => {
-  let number;
-  switch (string) {
-    case `All movies`:
-      number = filter.count;
-      break;
 
-    case `Watchlist`:
-      number = 1;
-      break;
-
-    case `History`:
-      number = 2;
-      break;
-
-    case `Favorites`:
-      number = 3;
-      break;
-  }
-
-  return number;
-};
-*/
 
 const generateFilterElements = (filters) => {
   let filtersList = ``;
 
   for (let filter in filters) {
-    let isActive = toggleClassName(filter.name);
+    if (filters.hasOwnProperty(filter)) {
+      let isActive = toggleClassName(filter);
 
-    filtersList +=
-      `<a href="#${filter.name}"
-            class="main-navigation__item${isActive}">${filter.name}
-        <span class="main-navigation__item-count">${filter.count}</span>
+      filtersList +=
+        `<a href="#${filter}"
+            class="main-navigation__item${isActive}">${filter}
+        <span class="main-navigation__item-count">${filters[filter].length}</span>
       </a>`;
+    }
   }
 
   return filtersList;

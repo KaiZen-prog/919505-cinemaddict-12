@@ -1,4 +1,9 @@
-import {FILMS_QUANTITY, FILMS_COUNT_PER_STEP, EXTRA_CARDS_COUNT} from "./const.js";
+import {
+  FILMS_QUANTITY,
+  FILMS_COUNT_PER_STEP,
+  SPECIAL_CARDS_COUNT,
+  EXTRA_SECTIONS
+} from "./const.js";
 
 import {getNumberFromString, render, isEscapeDown} from "./utils.js";
 
@@ -11,7 +16,6 @@ import {createMostCommentedSection} from "./view/most-commented-section.js";
 import {createCardsContainer} from "./view/cards-container.js";
 import {createShowMoreButton} from "./view/show-more-button.js";
 import {createCard} from "./view/card.js";
-import {createExtraCard} from "./view/card-extra.js";
 import {createStatistics} from "./view/statistics.js";
 
 import {createFilmPopup} from "./view/film-popup.js";
@@ -119,20 +123,72 @@ if (films.length > FILMS_COUNT_PER_STEP) {
   });
 }
 
-// Секции особых карточек
+// Секции особых фильмов
 const filmsSection = INDEX_MAIN.querySelector(`.films`);
-render(filmsSection, createTopSection(), `beforeend`);
-render(filmsSection, createMostCommentedSection(), `beforeend`);
 
-const extraFilmSectionCollection = filmsSection.querySelectorAll(`.films-list--extra`);
-extraFilmSectionCollection.forEach(function (el) {
-  render(el, createCardsContainer(), `beforeend`);
-  const container = el.querySelector(`.films-list__container`);
+const getSpecialFilmId = (film) => {
+  let id = 0;
 
-  for (let i = 0; i < EXTRA_CARDS_COUNT; i++) {
-    render(container, createExtraCard(), `beforeend`);
+  for (let i = 0; i < films.length; i++) {
+    if (film === films[i]) {
+      id = i + 1;
+      return id;
+    }
   }
+  return id;
+};
+
+// Секция самых рейтинговых фильмов
+const topFilms = films.slice().sort(function (left, right) {
+  let rankDiff = right.rating - left.rating;
+  if (rankDiff === 0) {
+    rankDiff = films.indexOf(left) - films.indexOf(right);
+  }
+  return rankDiff;
 });
 
+render(filmsSection, createTopSection(EXTRA_SECTIONS.top), `beforeend`);
+
+const topFilmsSection = filmsSection.lastChild;
+render(topFilmsSection, createCardsContainer(), `beforeend`);
+
+const topFilmsContainer = topFilmsSection.querySelector(`.films-list__container`);
+
+for (let i = 0; i < SPECIAL_CARDS_COUNT; i++) {
+  let filmId = getSpecialFilmId(topFilms[i]);
+  render(topFilmsContainer, createCard(topFilms[i], filmId), `beforeend`);
+
+  let card = topFilmsContainer.lastChild;
+  card.addEventListener(`click`, onCardClick);
+}
+
+
+// Секция самых комментируемых фильмов
+const mostCommentedFilms = films.slice().sort(function (left, right) {
+  let rankDiff = right.comments.length - left.comments.length;
+  if (rankDiff === 0) {
+    rankDiff = films.indexOf(left) - films.indexOf(right);
+  }
+  return rankDiff;
+});
+
+render(filmsSection, createTopSection(EXTRA_SECTIONS.commented), `beforeend`);
+
+const mostCommentedFilmsSection = filmsSection.lastChild;
+render(mostCommentedFilmsSection, createCardsContainer(), `beforeend`);
+
+const mostCommentedFilmsContainer = mostCommentedFilmsSection.querySelector(`.films-list__container`);
+
+for (let i = 0; i < SPECIAL_CARDS_COUNT; i++) {
+  let filmId = getSpecialFilmId(mostCommentedFilms[i]);
+  render(mostCommentedFilmsContainer, createCard(mostCommentedFilms[i], filmId), `beforeend`);
+
+  let card = mostCommentedFilmsContainer.lastChild;
+  card.addEventListener(`click`, onCardClick);
+}
+render(filmsSection, createMostCommentedSection(), `beforeend`);
+
+
+// Секция статистики
 const statisticsSection = document.querySelector(`.footer__statistics`);
-render(statisticsSection, createStatistics(), `beforeend`);
+render(statisticsSection, createStatistics(films.length), `beforeend`);
