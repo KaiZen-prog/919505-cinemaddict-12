@@ -42,28 +42,24 @@ render(filmsList, createCardsContainer(), `beforeend`);
 // Обработчики открытия\закрытия попапа
 const cards = document.querySelectorAll(`.film-card`);
 
-const closePopup = function () {
+const closePopup = () => {
   let popup = document.querySelector(`.film-details`);
   popup.remove();
 
-  cards.forEach(function (el) {
-    el.addEventListener(`click`, onCardClick);
-  });
+  cards.forEach((el) => el.addEventListener(`click`, onCardClick));
 
   document.removeEventListener(`keydown`, onPopupCloseKeyDown);
 };
 
-const onPopupCloseKeyDown = function (evt) {
+const onPopupCloseKeyDown = (evt) => {
   if (isEscapeDown(evt)) {
     closePopup();
   }
 };
 
-const onPopupCloseClick = function () {
-  closePopup();
-};
+const onPopupCloseClick = () => closePopup();
 
-const onCardClick = function (evt) {
+const onCardClick = (evt) => {
   if (evt.target.tagName === `IMG`) {
     const cardNumber = getNumberFromString(evt.currentTarget.id);
 
@@ -73,7 +69,7 @@ const onCardClick = function (evt) {
     let closeButton = popup.querySelector(`.film-details__close-btn`);
 
     closeButton.addEventListener(`click`, onPopupCloseClick);
-    cards.forEach(function (el) {
+    cards.forEach((el) => {
       el.removeEventListener(`click`, onCardClick);
     });
 
@@ -93,10 +89,8 @@ const createCardEventListener = (idNumber) => {
 
 // Рендеринг карточек
 for (let i = 0; i < Math.min(films.length, FILMS_COUNT_PER_STEP); i++) {
-  let idNumber = i + 1;
-  render(filmCardsContainer, createCard(films[i], idNumber), `beforeend`);
-
-  createCardEventListener(idNumber);
+  render(filmCardsContainer, createCard(films[i], i), `beforeend`);
+  createCardEventListener(i);
 }
 
 if (films.length > FILMS_COUNT_PER_STEP) {
@@ -131,7 +125,7 @@ const getSpecialFilmId = (film) => {
 
   for (let i = 0; i < films.length; i++) {
     if (film === films[i]) {
-      id = i + 1;
+      id = i;
       return id;
     }
   }
@@ -139,7 +133,7 @@ const getSpecialFilmId = (film) => {
 };
 
 // Секция самых рейтинговых фильмов
-const topFilms = films.slice().sort(function (left, right) {
+const topFilms = films.slice().sort((left, right) => {
   let rankDiff = right.rating - left.rating;
   if (rankDiff === 0) {
     rankDiff = films.indexOf(left) - films.indexOf(right);
@@ -164,7 +158,7 @@ for (let i = 0; i < SPECIAL_CARDS_COUNT; i++) {
 
 
 // Секция самых комментируемых фильмов
-const mostCommentedFilms = films.slice().sort(function (left, right) {
+const mostCommentedFilms = films.slice().sort((left, right) => {
   let rankDiff = right.comments.length - left.comments.length;
   if (rankDiff === 0) {
     rankDiff = films.indexOf(left) - films.indexOf(right);

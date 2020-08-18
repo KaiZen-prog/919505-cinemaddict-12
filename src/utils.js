@@ -5,7 +5,7 @@ const getRandomArrayElement = (array) => array[Math.floor(Math.random() * array.
 const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const getRandomSet = (items, num) => [...new Set(items.sort(getRandomBool).slice(0, num))];
 
-const addSpaceToStrings = function (strings) {
+const addSpaceToStrings = (strings) => {
   for (let i = 1; i < strings.length; i++) {
     strings[i] = ` ` + strings[i];
   }
@@ -13,16 +13,11 @@ const addSpaceToStrings = function (strings) {
   return strings;
 };
 
-function getRandomDate(from, to) {
-  from = from.getTime();
-  to = to.getTime();
-
-  return new Date(from + Math.random() * (to - from));
-}
+const getRandomDate = (from, to) => new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
 
 // Для автоматически генерируемых элементов мы используем id типа film-1, film-2 и т.д.
 // Данная функция возвращает число из произвольного id, которое можно будет использовать как порядковый номер элемента.
-const getNumberFromString = function (string) {
+const getNumberFromString = (string) => {
   let number = ``;
   for (let i = 0; i < string.length; i++) {
     if (parseInt(string[i], 10)) {
@@ -36,13 +31,9 @@ const getNumberFromString = function (string) {
   return parseInt(number, 10);
 };
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
+const render = (container, template, place) => container.insertAdjacentHTML(place, template);
 
-const isEscapeDown = function (evt) {
-  return evt.keyCode === KEY_CODE_ESCAPE;
-};
+const isEscapeDown = (evt) => evt.keyCode === KEY_CODE_ESCAPE;
 
 export {
   getRandomBool,
