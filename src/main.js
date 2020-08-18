@@ -1,7 +1,7 @@
 import {
   FILMS_QUANTITY,
   FILMS_COUNT_PER_STEP,
-  EXTRA_CARDS_COUNT,
+  SPECIAL_CARDS_COUNT,
   CLICKABLE_CARD_ELEMENTS,
   EXTRA_SECTIONS
 } from "./const.js";
@@ -158,7 +158,7 @@ const createSpecialFilmSection = (sectionTitle, specialCards) => {
 
   const specialCardsContainer = specialSection.querySelector(`.films-list__container`);
 
-  for (let i = 0; i < EXTRA_CARDS_COUNT; i++) {
+  for (let i = 0; i < SPECIAL_CARDS_COUNT; i++) {
     let cardId = getSpecialCardId(specialCards[i]);
     let card = new Card(specialCards[i], cardId).getElement();
     render(specialCardsContainer, card, renderPosition.beforeEnd);
