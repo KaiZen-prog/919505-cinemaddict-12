@@ -1,6 +1,7 @@
-const MAX_DESCRIPTION_LENGTH = 140;
+import {createElement} from "../utils.js";
+import {MAX_DESCRIPTION_LENGTH} from "../const.js";
 
-export const createCard = (film, idNumber) => {
+const createCard = (film, idNumber) => {
   const {
     title,
     rating,
@@ -44,3 +45,28 @@ export const createCard = (film, idNumber) => {
     </article>`
   );
 };
+
+export default class Card {
+  constructor(film, idNumber) {
+    this._film = film;
+    this._idNumber = idNumber;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCard(this._film, this._idNumber);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

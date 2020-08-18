@@ -1,4 +1,5 @@
 import {FILTER_ENTRIES} from '../const.js';
+import {createElement} from "../utils.js";
 
 const toggleClassName = (string) =>
   string === FILTER_ENTRIES[0]
@@ -24,7 +25,7 @@ const generateFilterElements = (filters) => {
   return filtersList;
 };
 
-export const createFilterTemplate = (filters) => {
+const createFilterTemplate = (filters) => {
   return (
     `<nav class="main-navigation">
         <div class="main-navigation__items">
@@ -34,3 +35,27 @@ export const createFilterTemplate = (filters) => {
     </nav>`
   );
 };
+
+export default class Filter {
+  constructor(filters) {
+    this._filters = filters;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilterTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

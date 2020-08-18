@@ -1,4 +1,6 @@
-export const createMainSection = () => {
+import {createElement} from "../utils.js";
+
+const createMainSection = () => {
   return (
     `<section class="films">
         <section class="films-list">
@@ -7,3 +9,25 @@ export const createMainSection = () => {
     </section>`
   );
 };
+
+export default class MainSection {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMainSection();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
