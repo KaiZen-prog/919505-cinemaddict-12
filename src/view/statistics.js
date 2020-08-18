@@ -1,5 +1,5 @@
-export const createStatistics = () => {
+export const createStatistics = (filmsQuantity) => {
   return (
-    `<p>130 291 movies inside</p>`
+    `<p>${filmsQuantity} movies inside</p>`
   );
 };
