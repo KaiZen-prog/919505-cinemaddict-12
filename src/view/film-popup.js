@@ -1,6 +1,7 @@
 import {MONTHS} from '../const.js';
+import {createElement} from "../utils.js";
 
-export const createFilmPopup = (film) => {
+const createFilmPopup = (film) => {
   const {
     poster,
     ageLimit,
@@ -208,3 +209,27 @@ export const createFilmPopup = (film) => {
      </section>`
   );
 };
+
+export default class FilmPopup {
+  constructor(film) {
+    this._film = film;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmPopup(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

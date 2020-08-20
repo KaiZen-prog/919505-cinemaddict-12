@@ -1,4 +1,5 @@
 import {SORTING_ENTRIES} from "../const.js";
+import {createElement} from "../utils.js";
 
 const generateSortingElements = () => {
   let sortingList = ``;
@@ -17,11 +18,33 @@ const generateSortingElements = () => {
   return sortingList;
 };
 
-export const createSortTemplate = () => {
+const createSortTemplate = () => {
   return (
     `<ul class="sort">
         ${generateSortingElements()}
     </ul>`
   );
 };
+
+export default class Sort {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
