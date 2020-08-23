@@ -38,7 +38,7 @@ const filters = generateFilter(films);
 render(INDEX_HEADER, new UserProfile().getElement(), renderPosition.beforeEnd);
 render(INDEX_MAIN, new Filter(filters).getElement(), renderPosition.beforeEnd);
 render(INDEX_MAIN, new Sort().getElement(), renderPosition.beforeEnd);
-render(INDEX_MAIN, new MainSection().getElement(), renderPosition.beforeEnd);
+render(INDEX_MAIN, new MainSection(films.length).getElement(), renderPosition.beforeEnd);
 
 const filmsList = INDEX_MAIN.querySelector(`.films-list`);
 render(filmsList, new CardsContainer().getElement(), renderPosition.beforeEnd);
@@ -117,24 +117,6 @@ if (films.length > FILMS_COUNT_PER_STEP) {
   });
 }
 
-// Сортируем фильмы по рейтингу
-const topCards = films.slice().sort((left, right) => {
-  let rankDiff = right.rating - left.rating;
-  if (rankDiff === 0) {
-    rankDiff = films.indexOf(left) - films.indexOf(right);
-  }
-  return rankDiff;
-});
-
-// Сортируем фильмы по количеству комментариев
-const mostCommentedCards = films.slice().sort((left, right) => {
-  let rankDiff = right.comments.length - left.comments.length;
-  if (rankDiff === 0) {
-    rankDiff = films.indexOf(left) - films.indexOf(right);
-  }
-  return rankDiff;
-});
-
 // Секции особых фильмов
 const cardSection = INDEX_MAIN.querySelector(`.films`);
 
@@ -158,7 +140,9 @@ const createSpecialFilmSection = (sectionTitle, specialCards) => {
 
   const specialCardsContainer = specialSection.querySelector(`.films-list__container`);
 
-  for (let i = 0; i < SPECIAL_CARDS_COUNT; i++) {
+  let quantity = Math.min(specialCards.length, SPECIAL_CARDS_COUNT);
+
+  for (let i = 0; i < quantity; i++) {
     let cardId = getSpecialCardId(specialCards[i]);
     let card = new Card(specialCards[i], cardId).getElement();
     render(specialCardsContainer, card, renderPosition.beforeEnd);
@@ -167,9 +151,28 @@ const createSpecialFilmSection = (sectionTitle, specialCards) => {
   }
 };
 
-createSpecialFilmSection(EXTRA_SECTIONS.top, topCards);
-createSpecialFilmSection(EXTRA_SECTIONS.commented, mostCommentedCards);
+if (films.length > 0) {
+  // Сортируем фильмы по рейтингу
+  const topCards = films.slice().sort((left, right) => {
+    let rankDiff = right.rating - left.rating;
+    if (rankDiff === 0) {
+      rankDiff = films.indexOf(left) - films.indexOf(right);
+    }
+    return rankDiff;
+  });
 
+  // Сортируем фильмы по количеству комментариев
+  const mostCommentedCards = films.slice().sort((left, right) => {
+    let rankDiff = right.comments.length - left.comments.length;
+    if (rankDiff === 0) {
+      rankDiff = films.indexOf(left) - films.indexOf(right);
+    }
+    return rankDiff;
+  });
+
+  createSpecialFilmSection(EXTRA_SECTIONS.top, topCards);
+  createSpecialFilmSection(EXTRA_SECTIONS.commented, mostCommentedCards);
+}
 
 // Секция статистики
 const statisticsSection = document.querySelector(`.footer__statistics`);

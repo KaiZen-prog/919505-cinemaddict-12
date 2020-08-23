@@ -1,22 +1,28 @@
 import {createElement} from "../utils.js";
 
-const createMainSection = () => {
+const toggleTitle = (filmsQuantity) =>
+  filmsQuantity > 0
+    ? `<h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>`
+    : `<h2 class="films-list__title">There are no movies in our database</h2>`;
+
+const createMainSection = (filmsQuantity) => {
   return (
     `<section class="films">
         <section class="films-list">
-            <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
+            ${toggleTitle(filmsQuantity)}
         </section>
     </section>`
   );
 };
 
 export default class MainSection {
-  constructor() {
+  constructor(filmsQuantity) {
+    this._filmsQuantity = filmsQuantity;
     this._element = null;
   }
 
   getTemplate() {
-    return createMainSection();
+    return createMainSection(this._filmsQuantity);
   }
 
   getElement() {
