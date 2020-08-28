@@ -5,7 +5,7 @@ import {
   getRandomSet,
   addSpaceToStrings,
   getRandomDate
-} from "../utils.js";
+} from "../utils/common.js";
 
 const titles = [
   `Made for each other`,

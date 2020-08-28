@@ -1,5 +1,5 @@
 import {FILTER_ENTRIES} from '../const.js';
-import {createElement} from "../utils.js";
+import Abstract from "./abstract";
 
 const toggleClassName = (string) =>
   string === FILTER_ENTRIES[0]
@@ -36,26 +36,13 @@ const createFilterTemplate = (filters) => {
   );
 };
 
-export default class Filter {
+export default class Filter extends Abstract {
   constructor(filters) {
+    super();
     this._filters = filters;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createFilterTemplate(this._filters);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

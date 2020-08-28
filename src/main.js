@@ -8,10 +8,13 @@ import {
 
 import {
   getNumberFromString,
-  render,
-  renderPosition,
   isEscapeDown
-} from "./utils.js";
+} from "./utils/common.js";
+
+import {
+  render,
+  RenderPosition,
+} from "./utils/render.js";
 
 import UserProfile from "./view/user-profile.js";
 import Filter from "./view/filter.js";
@@ -35,13 +38,13 @@ const INDEX_MAIN = document.querySelector(`.main`);
 const films = new Array(FILMS_QUANTITY).fill().map(generateFilm);
 const filters = generateFilter(films);
 
-render(INDEX_HEADER, new UserProfile().getElement(), renderPosition.beforeEnd);
-render(INDEX_MAIN, new Filter(filters).getElement(), renderPosition.beforeEnd);
-render(INDEX_MAIN, new Sort().getElement(), renderPosition.beforeEnd);
-render(INDEX_MAIN, new MainSection(films.length).getElement(), renderPosition.beforeEnd);
+render(INDEX_HEADER, new UserProfile().getElement(), RenderPosition.BEFOREEND);
+render(INDEX_MAIN, new Filter(filters).getElement(), RenderPosition.BEFOREEND);
+render(INDEX_MAIN, new Sort().getElement(), RenderPosition.BEFOREEND);
+render(INDEX_MAIN, new MainSection(films.length).getElement(), RenderPosition.BEFOREEND);
 
 const filmsList = INDEX_MAIN.querySelector(`.films-list`);
-render(filmsList, new CardsContainer().getElement(), renderPosition.beforeEnd);
+render(filmsList, new CardsContainer().getElement(), RenderPosition.BEFOREEND);
 
 // Обработчики открытия\закрытия попапа
 const cards = document.querySelectorAll(`.film-card`);
@@ -68,7 +71,7 @@ const onCardClick = (evt) => {
     const cardNumber = getNumberFromString(evt.currentTarget.id);
     const popup = new FilmPopup(films[cardNumber]).getElement();
 
-    render(INDEX_BODY, popup, renderPosition.beforeEnd);
+    render(INDEX_BODY, popup, RenderPosition.BEFOREEND);
 
     let closeButton = popup.querySelector(`.film-details__close-btn`);
 
@@ -87,7 +90,7 @@ const filmCardsContainer = filmsList.querySelector(`.films-list__container`);
 
 for (let i = 0; i < Math.min(films.length, FILMS_COUNT_PER_STEP); i++) {
   let card = new Card(films[i], i).getElement();
-  render(filmCardsContainer, card, renderPosition.beforeEnd);
+  render(filmCardsContainer, card, RenderPosition.BEFOREEND);
 
   card.addEventListener(`click`, onCardClick);
 }
@@ -97,7 +100,7 @@ if (films.length > FILMS_COUNT_PER_STEP) {
 
   const showMoreButton = new ShowMoreButton().getElement();
 
-  render(filmsList, showMoreButton, renderPosition.beforeEnd);
+  render(filmsList, showMoreButton, RenderPosition.BEFOREEND);
 
   showMoreButton.addEventListener(`click`, (evt) => {
     evt.preventDefault();
@@ -105,7 +108,7 @@ if (films.length > FILMS_COUNT_PER_STEP) {
       .slice(renderedFilmsCount, renderedFilmsCount + FILMS_COUNT_PER_STEP)
       .forEach((film) => {
         let card = new Card(film, filmCardsContainer.childElementCount).getElement();
-        render(filmCardsContainer, card, renderPosition.beforeEnd);
+        render(filmCardsContainer, card, RenderPosition.BEFOREEND);
         card.addEventListener(`click`, onCardClick);
       });
 
@@ -133,19 +136,19 @@ const getSpecialCardId = (film) => {
 };
 
 const createSpecialFilmSection = (sectionTitle, specialCards) => {
-  render(cardSection, new SpecialSection(sectionTitle).getElement(), renderPosition.beforeEnd);
+  render(cardSection, new SpecialSection(sectionTitle).getElement(), RenderPosition.BEFOREEND);
 
   const specialSection = cardSection.lastChild;
-  render(specialSection, new CardsContainer().getElement(), renderPosition.beforeEnd);
+  render(specialSection, new CardsContainer().getElement(), RenderPosition.BEFOREEND);
 
   const specialCardsContainer = specialSection.querySelector(`.films-list__container`);
 
-  let quantity = Math.min(specialCards.length, SPECIAL_CARDS_COUNT);
+  const quantity = Math.min(specialCards.length, SPECIAL_CARDS_COUNT);
 
   for (let i = 0; i < quantity; i++) {
     let cardId = getSpecialCardId(specialCards[i]);
     let card = new Card(specialCards[i], cardId).getElement();
-    render(specialCardsContainer, card, renderPosition.beforeEnd);
+    render(specialCardsContainer, card, RenderPosition.BEFOREEND);
 
     card.addEventListener(`click`, onCardClick);
   }
@@ -176,4 +179,4 @@ if (films.length > 0) {
 
 // Секция статистики
 const statisticsSection = document.querySelector(`.footer__statistics`);
-render(statisticsSection, new StatisticsSection(films.length).getElement(), renderPosition.beforeEnd);
+render(statisticsSection, new StatisticsSection(films.length).getElement(), RenderPosition.BEFOREEND);

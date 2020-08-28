@@ -1,5 +1,5 @@
-import {createElement} from "../utils.js";
 import {MAX_DESCRIPTION_LENGTH} from "../const.js";
+import Abstract from "./abstract";
 
 const createCard = (film, idNumber) => {
   const {
@@ -46,27 +46,14 @@ const createCard = (film, idNumber) => {
   );
 };
 
-export default class Card {
+export default class Card extends Abstract {
   constructor(film, idNumber) {
+    super();
     this._film = film;
     this._idNumber = idNumber;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createCard(this._film, this._idNumber);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
