@@ -12,7 +12,7 @@ const createMainSection = (filmsQuantity) => {
   );
 };
 
-export default class MainSection extends Abstract {
+export default class FilmsListSection extends Abstract {
   constructor(filmsQuantity) {
     super();
     this._filmsQuantity = filmsQuantity;

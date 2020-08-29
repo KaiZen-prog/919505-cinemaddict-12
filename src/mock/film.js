@@ -7,6 +7,8 @@ import {
   getRandomDate
 } from "../utils/common.js";
 
+import {FILMS_QUANTITY} from "../const";
+
 const titles = [
   `Made for each other`,
   `Popeye meets Sinbad`,
@@ -126,7 +128,7 @@ const generateComment = () => ({
 
 const getComments = (num) => Array.from({length: num}, generateComment);
 
-export const generateFilm = () => ({
+const generateFilm = () => ({
   title: getRandomArrayElement(titles),
   director: getRandomArrayElement(CREATORS),
   writers: setWriters(),
@@ -143,4 +145,16 @@ export const generateFilm = () => ({
   isWatched: getRandomBool(),
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
+  id: ``
 });
+
+export const getFilms = () => {
+  const films = [];
+  for (let i = 0; i < FILMS_QUANTITY; i++) {
+    let newFilm = generateFilm();
+    newFilm.id = `film-` + i;
+    films.push(newFilm);
+  }
+
+  return films;
+};

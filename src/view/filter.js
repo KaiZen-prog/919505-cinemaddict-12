@@ -15,10 +15,9 @@ const generateFilterElements = (filters) => {
       let isActive = toggleClassName(filter);
 
       filtersList +=
-        `<a href="#${filter}"
-            class="main-navigation__item${isActive}">${filter}
-        <span class="main-navigation__item-count">${filters[filter].length}</span>
-      </a>`;
+        `<a href="#${filter}" class="main-navigation__item${isActive}" data-filter="${filter}">
+            ${filter}<span class="main-navigation__item-count">${filters[filter].length}</span>
+        </a>`;
     }
   }
 
@@ -40,9 +39,21 @@ export default class Filter extends Abstract {
   constructor(filters) {
     super();
     this._filters = filters;
+
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilterTemplate(this._filters);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click(evt);
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().addEventListener(`click`, this._clickHandler);
   }
 }
