@@ -2,7 +2,7 @@ import {FILTER_ENTRIES} from '../const.js';
 import Abstract from "./abstract";
 
 const toggleClassName = (string) =>
-  string === FILTER_ENTRIES[0]
+  string === FILTER_ENTRIES.ALL
     ? ` main-navigation__item--active`
     : ``;
 

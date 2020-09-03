@@ -7,7 +7,8 @@ import {
   FILMS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
   CLICKABLE_CARD_ELEMENTS,
-  EXTRA_SECTIONS
+  EXTRA_SECTIONS,
+  SORTING_ENTRIES
 } from "../const.js";
 
 import {
@@ -25,7 +26,6 @@ import ShowMoreButton from "../view/show-more-button.js";
 import Card from "../view/card.js";
 import FilmPopup from "../view/film-popup.js";
 import Filter from "../view/filter";
-import {SORTING_ENTRIES} from "../const";
 
 const INDEX_BODY = document.querySelector(`body`);
 const INDEX_MAIN = document.querySelector(`.main`);
@@ -40,6 +40,7 @@ export default class FilmList {
 
   init(films, filters) {
     this._films = films.slice();
+    this._sourcedFilms = films.slice();
     this._filters = filters;
     this._filtersComponent = new Filter(this._filters);
 
@@ -87,40 +88,49 @@ export default class FilmList {
   }
 
   // Меняем стили на фильтре и сортировке
-  _toggleButtons(component, newButton, elementClass) {
-    const currentButton = component.getElement().querySelector(`.` + elementClass);
+  _toggleButtons(currentButton, newButton, elementClass) {
     currentButton.classList.remove(elementClass);
     newButton.classList.add(elementClass);
   }
 
+  // Проверяем, не нажат ли уже активный фильтр или сортировка
+  _isButtonChanged(component, newButton, elementClass) {
+    const currentButton = component.getElement().querySelector(`.` + elementClass);
+    if (currentButton === newButton) {
+      return false;
+    }
+
+    this._toggleButtons(currentButton, newButton, elementClass);
+    this._clearMainFilmList();
+    return true;
+  }
+
   // Панель фильтрации
   _renderFilterPanel() {
-    const onFilterChange = (evt) => {
-      this._toggleButtons(this._filtersComponent, evt.target, `main-navigation__item--active`);
-      this._clearMainFilmList();
-
-      const newFilter = evt.target.dataset.filter;
-      this._films = this._filters[newFilter];
-      const currentSort = this._sortingComponent.getElement().querySelector(`.sort__button--active`);
-      const sortedFilms = this._getSortedFilms(currentSort.dataset.sort);
-      this._renderMainFilmList(sortedFilms);
+    const onFilterClick = (evt) => {
+      if (this._isButtonChanged(this._filtersComponent, evt.target, `main-navigation__item--active`)) {
+        const newFilter = evt.target.dataset.filter;
+        this._films = this._filters[newFilter];
+        const currentSort = this._sortingComponent.getElement().querySelector(`.sort__button--active`);
+        const sortedFilms = this._getSortedFilms(currentSort.dataset.sortBtn);
+        this._renderMainFilmList(sortedFilms);
+      }
     };
 
     render(INDEX_MAIN, this._filtersComponent, RenderPosition.BEFOREEND);
 
     this._filtersComponent.setClickHandler((evt) => {
-      onFilterChange(evt);
+      onFilterClick(evt);
     });
   }
 
   // Панель сортировки
   _renderSortingPanel() {
     const onSortingChange = (evt) => {
-      this._toggleButtons(this._sortingComponent, evt.target, `sort__button--active`);
-      this._clearMainFilmList();
-
-      const sortedFilms = this._getSortedFilms(evt.target.dataset.sort);
-      this._renderMainFilmList(sortedFilms);
+      if (this._isButtonChanged(this._sortingComponent, evt.target, `sort__button--active`)) {
+        const sortedFilms = this._getSortedFilms(evt.target.dataset.sortBtn);
+        this._renderMainFilmList(sortedFilms);
+      }
     };
 
     render(INDEX_MAIN, this._sortingComponent, RenderPosition.BEFOREEND);
@@ -133,15 +143,15 @@ export default class FilmList {
   _getSortedFilms(sortBy) {
     let sortedFilms;
     switch (sortBy) {
-      case SORTING_ENTRIES[0] :
+      case SORTING_ENTRIES.DEFAULT :
         sortedFilms = this._films;
         break;
 
-      case SORTING_ENTRIES[1] :
+      case SORTING_ENTRIES.DATE :
         sortedFilms = this._sortFilmsByReleaseDate(this._films);
         break;
 
-      case SORTING_ENTRIES[2] :
+      case SORTING_ENTRIES.RATING :
         sortedFilms = this._sortFilmsByRating(this._films);
         break;
 
@@ -172,9 +182,9 @@ export default class FilmList {
 
     // Обработчик клика по карточке
     const onCardClick = (evt) => {
-      if (CLICKABLE_CARD_ELEMENTS.includes(evt.target.tagName)) {
+      if (CLICKABLE_CARD_ELEMENTS.hasOwnProperty(evt.target.tagName)) {
         const cardNumber = getNumberFromString(evt.currentTarget.id);
-        const popup = new FilmPopup(this._films[cardNumber]);
+        const popup = new FilmPopup(this._sourcedFilms[cardNumber]);
 
         render(INDEX_BODY, popup, RenderPosition.BEFOREEND);
 
@@ -193,6 +203,7 @@ export default class FilmList {
     }
   }
 
+  // Кнопка Show more
   _renderShowMoreButton(container, films) {
     let renderedFilmsCount = FILMS_COUNT_PER_STEP;
 

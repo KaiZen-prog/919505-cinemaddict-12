@@ -1,18 +1,20 @@
 import {SORTING_ENTRIES} from "../const.js";
 import Abstract from "./abstract";
 
-const generateSortingElements = () => {
+const generateSortingList = () => {
   let sortingList = ``;
 
-  for (let i = 0; i < SORTING_ENTRIES.length; i++) {
-    const isActive = SORTING_ENTRIES[i] === `Sort by default`
-      ? ` sort__button--active`
-      : ``;
+  for (let entry in SORTING_ENTRIES) {
+    if ({}.hasOwnProperty.call(SORTING_ENTRIES, entry)) {
+      const isActive = SORTING_ENTRIES[entry] === `Sort by default`
+        ? ` sort__button--active`
+        : ``;
 
-    sortingList +=
-      `<li>
-        <a href="#" class="sort__button${isActive}" data-sort="${SORTING_ENTRIES[i]}">${SORTING_ENTRIES[i]}</a>
+      sortingList +=
+        `<li>
+        <a href="#" class="sort__button${isActive}" data-sort-btn="${SORTING_ENTRIES[entry]}">${SORTING_ENTRIES[entry]}</a>
       </li>`;
+    }
   }
 
   return sortingList;
@@ -21,7 +23,7 @@ const generateSortingElements = () => {
 const createSortTemplate = () => {
   return (
     `<ul class="sort">
-        ${generateSortingElements()}
+        ${generateSortingList()}
     </ul>`
   );
 };

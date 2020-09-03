@@ -34,7 +34,7 @@ const createCard = (film, filmId) => {
             <span class="film-card__duration">${duration}</span>
             <span class="film-card__genre">${genres}</span>
         </p>
-        <img src=${poster}  alt="" class="film-card__poster">
+        <img src="./images/posters/${poster}"  alt="" class="film-card__poster">
         <p class="film-card__description">${filmDescription}</p>
         <a class="film-card__comments">${commentsLinkTitle}</a>
         <form class="film-card__controls">
