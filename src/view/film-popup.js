@@ -1,5 +1,5 @@
 import {MONTHS} from '../const.js';
-import {createElement} from "../utils.js";
+import Abstract from "./abstract";
 
 const createFilmPopup = (film) => {
   const {
@@ -101,7 +101,7 @@ const createFilmPopup = (film) => {
             </div>
             <div class="film-details__info-wrap">
               <div class="film-details__poster">
-                <img class="film-details__poster-img" src="${poster}" alt="">
+                <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
 
                 <p class="film-details__age">${ageLimit}+</p>
               </div>
@@ -210,26 +210,27 @@ const createFilmPopup = (film) => {
   );
 };
 
-export default class FilmPopup {
+export default class FilmPopup extends Abstract {
   constructor(film) {
+    super();
     this._film = film;
 
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopup(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click(evt);
   }
 
-  removeElement() {
-    this._element = null;
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
+    closeButton.addEventListener(`click`, this._clickHandler);
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import Abstract from "./abstract";
 
 const createSpecialSection = (title) => {
   return (
@@ -8,25 +8,13 @@ const createSpecialSection = (title) => {
   );
 };
 
-export default class SpecialSection {
+export default class SpecialSection extends Abstract {
   constructor(title) {
+    super();
     this._title = title;
-    this._element = null;
   }
 
   getTemplate() {
     return createSpecialSection(this._title);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

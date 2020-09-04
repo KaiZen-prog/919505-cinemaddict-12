@@ -1,30 +1,18 @@
-import {createElement} from "../utils.js";
+import Abstract from "./abstract";
 
-export const createStatistics = (filmsQuantity) => {
+const createStatistics = (filmsQuantity) => {
   return (
     `<p>${filmsQuantity} movies inside</p>`
   );
 };
 
-export default class StatisticsSection {
+export default class StatisticsSection extends Abstract {
   constructor(filmsQuantity) {
+    super();
     this._filmsQuantity = filmsQuantity;
-    this._element = null;
   }
 
   getTemplate() {
     return createStatistics(this._filmsQuantity);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

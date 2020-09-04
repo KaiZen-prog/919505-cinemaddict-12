@@ -5,11 +5,11 @@ const FILMS_COUNT_PER_STEP = 5;
 const SPECIAL_CARDS_COUNT = 2;
 const MAX_DESCRIPTION_LENGTH = 140;
 
-const CLICKABLE_CARD_ELEMENTS = [
-  `IMG`,
-  `H3`,
-  `A`
-];
+const CLICKABLE_CARD_ELEMENTS = {
+  IMG: `IMG`,
+  H3: `H3`,
+  A: `A`
+};
 
 const MONTHS = [
   `January`,
@@ -26,18 +26,18 @@ const MONTHS = [
   `December`
 ];
 
-const FILTER_ENTRIES = [
-  `All movies`,
-  `Watchlist`,
-  `History`,
-  `Favorites`
-];
+const FILTER_ENTRIES = {
+  ALL: `All movies`,
+  WATCHLIST: `Watchlist`,
+  HISTORY: `History`,
+  FAVORITES: `Favorites`
+};
 
-const SORTING_ENTRIES = [
-  `Sort by default`,
-  `Sort by date`,
-  `Sort by rating`,
-];
+const SORTING_ENTRIES = {
+  DEFAULT: `Sort by default`,
+  DATE: `Sort by date`,
+  RATING: `Sort by rating`,
+};
 
 const EXTRA_SECTIONS = {
   top: `Top rated`,

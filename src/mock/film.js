@@ -5,7 +5,9 @@ import {
   getRandomSet,
   addSpaceToStrings,
   getRandomDate
-} from "../utils.js";
+} from "../utils/common.js";
+
+import {FILMS_QUANTITY} from "../const";
 
 const titles = [
   `Made for each other`,
@@ -18,28 +20,16 @@ const titles = [
 ];
 
 const posters = [
-  `./images/posters/made-for-each-other.png`,
-  `./images/posters/popeye-meets-sinbad.png`,
-  `./images/posters/sagebrush-trail.jpg`,
-  `./images/posters/santa-claus-conquers-the-martians.jpg`,
-  `./images/posters/the-dance-of-life.jpg`,
-  `./images/posters/the-great-flamarion.jpg`,
-  `./images/posters/the-man-with-the-golden-arm.jpg`,
+  `made-for-each-other.png`,
+  `popeye-meets-sinbad.png`,
+  `sagebrush-trail.jpg`,
+  `santa-claus-conquers-the-martians.jpg`,
+  `the-dance-of-life.jpg`,
+  `the-great-flamarion.jpg`,
+  `the-man-with-the-golden-arm.jpg`,
 ];
 
-const descriptions = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-  `Aliquam erat volutpat.`,
-  `Nunc fermentum tortor ac porta dapibus.`,
-  `In rutrum ac purus sit amet tempus.`
-];
+const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 
 const EMOJIS = [
   `/images/emoji/angry.png`,
@@ -81,19 +71,15 @@ const AGE_LIMITS = [6, 12, 16, 18, 21];
 
 const getRandomDuration = function () {
   const duration = getRandomInteger(10, 180);
-  let hours;
-  let minutes;
+  let hours = Math.floor(duration / 60) + `h`;
+  let minutes = duration % 60 + `m`;
 
   if (Math.floor(duration / 60) === 0) {
     hours = ``;
-  } else {
-    hours = Math.floor(duration / 60) + `h`;
   }
 
   if (duration % 60 === 0) {
     minutes = ``;
-  } else {
-    minutes = duration % 60 + `m`;
   }
 
   return hours + ` ` + minutes;
@@ -119,14 +105,14 @@ const setGenres = function () {
 
 const generateComment = () => ({
   emotion: getRandomArrayElement(EMOJIS),
-  text: getRandomArrayElement(descriptions),
+  text: getRandomArrayElement(description),
   author: getRandomArrayElement(CREATORS),
   date: Date.now() - getRandomInteger(0, 30 * 24 * 60 * 60 * 1000),
 });
 
 const getComments = (num) => Array.from({length: num}, generateComment);
 
-export const generateFilm = () => ({
+const generateFilm = () => ({
   title: getRandomArrayElement(titles),
   director: getRandomArrayElement(CREATORS),
   writers: setWriters(),
@@ -138,9 +124,21 @@ export const generateFilm = () => ({
   duration: getRandomDuration(),
   genres: setGenres(),
   ageLimit: getRandomArrayElement(AGE_LIMITS),
-  description: getRandomSet(descriptions, getRandomInteger(1, 5)).join(` `),
+  description: description.split(`.`, getRandomInteger(1, 5)),
   inWatchlist: getRandomBool(),
   isWatched: getRandomBool(),
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
+  id: ``
 });
+
+export const getFilms = () => {
+  const films = [];
+  for (let i = 0; i < FILMS_QUANTITY; i++) {
+    let newFilm = generateFilm();
+    newFilm.id = `film-` + i;
+    films.push(newFilm);
+  }
+
+  return films;
+};
