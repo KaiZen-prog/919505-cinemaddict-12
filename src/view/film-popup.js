@@ -1,5 +1,5 @@
+import SmartView from "./smart.js";
 import {MONTHS} from '../const.js';
-import Abstract from "./abstract";
 
 const createFilmPopup = (film) => {
   const {
@@ -210,7 +210,7 @@ const createFilmPopup = (film) => {
   );
 };
 
-export default class FilmPopup extends Abstract {
+export default class FilmPopup extends SmartView {
   constructor(film) {
     super();
     this._film = film;

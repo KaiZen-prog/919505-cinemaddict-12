@@ -1,12 +1,8 @@
-import {
-  getNumberFromString,
-  isEscapeDown
-} from "../utils/common.js";
+import {updateItem} from "../utils/common.js";
 
 import {
   FILMS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
-  CLICKABLE_CARD_ELEMENTS,
   EXTRA_SECTIONS,
   SORTING_ENTRIES
 } from "../const.js";
@@ -23,11 +19,9 @@ import FilmsListSection from "../view/films-list-section.js";
 import CardsContainer from "../view/cards-container.js";
 import SpecialSection from "../view/special-section.js";
 import ShowMoreButton from "../view/show-more-button.js";
-import Card from "../view/card.js";
-import FilmPopup from "../view/film-popup.js";
+import CardPresenter from "../presenter/film-card.js";
 import Filter from "../view/filter";
 
-const INDEX_BODY = document.querySelector(`body`);
 const INDEX_MAIN = document.querySelector(`.main`);
 
 export default class FilmList {
@@ -36,6 +30,9 @@ export default class FilmList {
     this._sortingComponent = new Sort();
     this._cardsContainerComponent = new CardsContainer();
     this._showMoreButtonComponent = new ShowMoreButton();
+    this._cardPresenter = {};
+
+    this._handleFilmChange = this._handleFilmChange.bind(this);
   }
 
   init(films, filters) {
@@ -162,45 +159,23 @@ export default class FilmList {
     return sortedFilms;
   }
 
+  _handleFilmChange(updatedFilm) {
+    this._films = updateItem(this._films, updatedFilm);
+    this._sourcedFilms = updateItem(this._sourcedFilms, updatedFilm);
+    this._cardPresenter[updatedFilm.id].init(updatedFilm);
+  }
+
   // Рендеринг карточек
+  _renderCard(cardsContainer, film) {
+    const cardPresenter = new CardPresenter(cardsContainer, this._handleFilmChange);
+    cardPresenter.init(film);
+    this._cardPresenter[film.id] = cardPresenter;
+  }
+
   _renderCards(cardsContainer, films, from, to) {
-    // Обработчики закрытия попапа
-    const closePopup = () => {
-      let popup = document.querySelector(`.film-details`);
-      popup.remove();
-
-      document.removeEventListener(`keydown`, onPopupCloseKeyDown);
-    };
-
-    const onPopupCloseKeyDown = (evt) => {
-      if (isEscapeDown(evt)) {
-        closePopup();
-      }
-    };
-
-    const onPopupCloseClick = () => closePopup();
-
-    // Обработчик клика по карточке
-    const onCardClick = (evt) => {
-      if (CLICKABLE_CARD_ELEMENTS.hasOwnProperty(evt.target.tagName)) {
-        const cardNumber = getNumberFromString(evt.currentTarget.id);
-        const popup = new FilmPopup(this._sourcedFilms[cardNumber]);
-
-        render(INDEX_BODY, popup, RenderPosition.BEFOREEND);
-
-        popup.setClickHandler(onPopupCloseClick);
-        document.addEventListener(`keydown`, onPopupCloseKeyDown);
-      }
-    };
-
-    for (let i = from; i < to; i++) {
-      let cardComponent = new Card(films[i], films[i].id);
-      render(cardsContainer, cardComponent, RenderPosition.BEFOREEND);
-
-      cardComponent.setClickHandler((evt) => {
-        onCardClick(evt);
-      });
-    }
+    films
+      .slice(from, to)
+      .forEach((film) => this._renderCard(cardsContainer, film));
   }
 
   // Кнопка Show more

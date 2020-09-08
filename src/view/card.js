@@ -53,6 +53,7 @@ export default class Card extends Abstract {
     this._filmId = filmId;
 
     this._clickHandler = this._clickHandler.bind(this);
+    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
   }
 
   getTemplate() {
@@ -68,4 +69,15 @@ export default class Card extends Abstract {
     this._callback.click = callback;
     this.getElement().addEventListener(`click`, this._clickHandler);
   }
+
+  _addToWatchListHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick(evt);
+  }
+
+  setWatchListHandler(callback) {
+    this._callback.watchListClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addToWatchListHandler);
+  }
+
 }
