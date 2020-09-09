@@ -33,8 +33,8 @@ export const getNumberFromString = (string) => {
   return parseInt(number, 10);
 };
 
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
+export const updateItem = (items, updatedItem) => {
+  const index = items.findIndex((item) => item.id === updatedItem.id);
 
   if (index === -1) {
     return items;
@@ -42,7 +42,7 @@ export const updateItem = (items, update) => {
 
   return [
     ...items.slice(0, index),
-    update,
+    updatedItem,
     ...items.slice(index + 1)
   ];
 };

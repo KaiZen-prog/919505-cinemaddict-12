@@ -4,30 +4,33 @@ import {isEscapeDown} from "../utils/common";
 const INDEX_BODY = document.querySelector(`body`);
 
 export default class FilmPopup {
-  constructor(film) {
+  constructor(film, changeData) {
     this._film = film;
+    this._changeData = changeData;
+
+    this._onPopupCloseKeyDown = this._onPopupCloseKeyDown.bind(this);
   }
 
   init() {
-    const popupView = new FilmPopupView(this._film);
-    render(INDEX_BODY, popupView, RenderPosition.BEFOREEND);
+    this._popupComponent = new FilmPopupView(this._film);
+    render(INDEX_BODY, this._popupComponent, RenderPosition.BEFOREEND);
 
-    // Обработчики закрытия попапа
-    const closePopup = () => {
-      let popup = document.querySelector(`.film-details`);
-      popup.remove();
+    this._popupComponent.setClickHandler(this._closePopup);
+    document.addEventListener(`keydown`, this._onPopupCloseKeyDown);
+  }
 
-      document.removeEventListener(`keydown`, onPopupCloseKeyDown);
-    };
+  // Обработчики закрытия попапа
+  _closePopup() {
+    let popup = document.querySelector(`.film-details`);
+    popup.remove();
 
-    const onPopupCloseKeyDown = (evt) => {
-      if (isEscapeDown(evt)) {
-        closePopup();
-      }
-    };
+    document.removeEventListener(`keydown`, this._onPopupCloseKeyDown);
+  }
 
-    popupView.setClickHandler(closePopup);
-    document.addEventListener(`keydown`, onPopupCloseKeyDown);
+  _onPopupCloseKeyDown(evt) {
+    if (isEscapeDown(evt)) {
+      this._closePopup();
+    }
   }
 }
 

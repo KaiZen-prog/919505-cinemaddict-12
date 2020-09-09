@@ -20,7 +20,7 @@ const filters = generateFilter(films);
 // Блок профиля
 render(INDEX_HEADER, new UserProfile().getElement(), RenderPosition.BEFOREEND);
 
-// Презентер
+// Презентер списков фильмов
 const filmsPresenter = new FilmsPresenter(INDEX_MAIN);
 filmsPresenter.init(films, filters);
 

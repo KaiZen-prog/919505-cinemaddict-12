@@ -10,7 +10,7 @@ const createCard = (film, filmId) => {
     genres,
     poster,
     comments,
-    description
+    description,
   } = film;
 
   let commentsLinkTitle;
@@ -53,7 +53,10 @@ export default class Card extends Abstract {
     this._filmId = filmId;
 
     this._clickHandler = this._clickHandler.bind(this);
+
     this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
+    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
   }
 
   getTemplate() {
@@ -80,4 +83,23 @@ export default class Card extends Abstract {
     this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addToWatchListHandler);
   }
 
+  _addToHistoryHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyClick(evt);
+  }
+
+  setHistoryHandler(callback) {
+    this._callback.historyClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, this._addToHistoryHandler);
+  }
+
+  _addToFavoritesHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoritesClick(evt);
+  }
+
+  setFavoritesHandler(callback) {
+    this._callback.favoritesClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
+  }
 }

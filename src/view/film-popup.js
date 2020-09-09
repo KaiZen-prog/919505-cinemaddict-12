@@ -1,6 +1,10 @@
 import SmartView from "./smart.js";
 import {MONTHS} from '../const.js';
 
+const getEmoji = (src) => {
+  return `<img src="${src}" width="55" height="55" alt="emoji">`;
+};
+
 const createFilmPopup = (film) => {
   const {
     poster,
@@ -91,6 +95,7 @@ const createFilmPopup = (film) => {
 
     return commentsList;
   };
+
 
   return (
     `<section class="film-details">
@@ -215,11 +220,63 @@ export default class FilmPopup extends SmartView {
     super();
     this._film = film;
 
+    this._isInWatchlist = film.inWatchlist;
+    this._isinHistory = film.isWatched;
+    this._isFavorite = film.isFavorite;
+
     this._clickHandler = this._clickHandler.bind(this);
+    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
+    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createFilmPopup(this._film);
+  }
+
+  _setInnerHandlers() {
+    const element = this.getElement();
+    const emojiContainer = element.querySelector(`.film-details__add-emoji-label`);
+
+    element
+      .querySelector(`.film-details__control-label--watchlist`)
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+
+        this._isInWatchlist = !this._isInWatchlist;
+        this.updateElement();
+      });
+
+    element
+      .querySelector(`.film-details__control-label--watched`)
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+
+        this._isinHistory = !this._isinHistory;
+        this.updateElement();
+      });
+
+    element.querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isFavorite = !this._isFavorite;
+      this.updateElement();
+    });
+
+    element
+      .querySelector(`.film-details__emoji-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.tagName === `IMG`) {
+          this._emoji = evt.target.src;
+          emojiContainer.innerHTML = getEmoji(this._emoji);
+        }
+      });
+  }
+
+  restoreHandlers() {
+    this.setClickHandler(this._clickHandler);
+    this._setInnerHandlers();
   }
 
   _clickHandler(evt) {
@@ -232,5 +289,20 @@ export default class FilmPopup extends SmartView {
 
     let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
     closeButton.addEventListener(`click`, this._clickHandler);
+  }
+
+  _addToWatchListHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick(evt);
+  }
+
+  _addToHistoryHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyClick(evt);
+  }
+
+  _addToFavoritesHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoritesClick(evt);
   }
 }

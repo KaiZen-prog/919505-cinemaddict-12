@@ -114,7 +114,7 @@ export default class FilmList {
       }
     };
 
-    render(INDEX_MAIN, this._filtersComponent, RenderPosition.BEFOREEND);
+    render(INDEX_MAIN, this._filtersComponent, RenderPosition.AFTERBEGIN);
 
     this._filtersComponent.setClickHandler((evt) => {
       onFilterClick(evt);
@@ -159,10 +159,10 @@ export default class FilmList {
     return sortedFilms;
   }
 
+  // Обработчик изменения фильмов
   _handleFilmChange(updatedFilm) {
     this._films = updateItem(this._films, updatedFilm);
     this._sourcedFilms = updateItem(this._sourcedFilms, updatedFilm);
-    this._cardPresenter[updatedFilm.id].init(updatedFilm);
   }
 
   // Рендеринг карточек
