@@ -1,11 +1,15 @@
 import SmartView from "./smart.js";
 import {MONTHS} from '../const.js';
 
-const getEmoji = (src) => {
-  return `<img src="${src}" width="55" height="55" alt="emoji">`;
+const getEmoji = (emojiSrc) => {
+  if (emojiSrc !== ``) {
+    return `<img src="${emojiSrc}" width="55" height="55" alt="emoji">`;
+  } else {
+    return ``;
+  }
 };
 
-const createFilmPopup = (film) => {
+const createFilmPopup = (data) => {
   const {
     poster,
     ageLimit,
@@ -19,8 +23,9 @@ const createFilmPopup = (film) => {
     country,
     genres,
     description,
-    comments
-  } = film;
+    comments,
+    emojiSrc
+  } = data;
 
   // Приводим дату выхода к требуемому виду
   const setReleaseDate = function () {
@@ -180,7 +185,9 @@ const createFilmPopup = (film) => {
               </ul>
 
               <div class="film-details__new-comment">
-                <div for="add-emoji" class="film-details__add-emoji-label"></div>
+                <div for="add-emoji" class="film-details__add-emoji-label">
+                    ${getEmoji(emojiSrc)}
+                </div>
 
                 <label class="film-details__comment-label">
                   <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -219,6 +226,7 @@ export default class FilmPopup extends SmartView {
   constructor(film) {
     super();
     this._film = film;
+    this._data = FilmPopup.parseFilmToData(film);
 
     this._isInWatchlist = film.inWatchlist;
     this._isinHistory = film.isWatched;
@@ -233,30 +241,23 @@ export default class FilmPopup extends SmartView {
   }
 
   getTemplate() {
-    return createFilmPopup(this._film);
+    return createFilmPopup(this._data);
   }
 
   _setInnerHandlers() {
     const element = this.getElement();
-    const emojiContainer = element.querySelector(`.film-details__add-emoji-label`);
 
-    element
-      .querySelector(`.film-details__control-label--watchlist`)
-      .addEventListener(`click`, (evt) => {
-        evt.preventDefault();
+    element.querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isInWatchlist = !this._isInWatchlist;
+      this.updateElement();
+    });
 
-        this._isInWatchlist = !this._isInWatchlist;
-        this.updateElement();
-      });
-
-    element
-      .querySelector(`.film-details__control-label--watched`)
-      .addEventListener(`click`, (evt) => {
-        evt.preventDefault();
-
-        this._isinHistory = !this._isinHistory;
-        this.updateElement();
-      });
+    element.querySelector(`.film-details__control-label--watched`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isinHistory = !this._isinHistory;
+      this.updateElement();
+    });
 
     element.querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, (evt) => {
       evt.preventDefault();
@@ -264,18 +265,18 @@ export default class FilmPopup extends SmartView {
       this.updateElement();
     });
 
-    element
-      .querySelector(`.film-details__emoji-list`)
-      .addEventListener(`click`, (evt) => {
-        if (evt.target.tagName === `IMG`) {
-          this._emoji = evt.target.src;
-          emojiContainer.innerHTML = getEmoji(this._emoji);
-        }
-      });
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `IMG`) {
+        evt.preventDefault();
+        this.updateData({
+          emojiSrc: evt.target.src
+        });
+      }
+    });
   }
 
   restoreHandlers() {
-    this.setClickHandler(this._clickHandler);
+    this.setClickHandler(this._callback.click);
     this._setInnerHandlers();
   }
 
@@ -304,5 +305,27 @@ export default class FilmPopup extends SmartView {
   _addToFavoritesHandler(evt) {
     evt.preventDefault();
     this._callback.favoritesClick(evt);
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+        {},
+        film,
+        {
+          poster: film.poster,
+          ageLimit: film.ageLimit,
+          title: film.title,
+          rating: film.rating,
+          director: film.director,
+          writers: film.writers,
+          actors: film.actors,
+          releaseDate: film.releaseDate,
+          duration: film.duration,
+          country: film.country,
+          genres: film.genres,
+          description: film.description,
+          comments: film.comments,
+          emojiSrc: film.emojiSrc
+        });
   }
 }

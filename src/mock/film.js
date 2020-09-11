@@ -105,7 +105,7 @@ const setGenres = function () {
 
 const generateComment = () => ({
   emotion: getRandomArrayElement(EMOJIS),
-  text: getRandomArrayElement(description),
+  text: description.split(`.`, getRandomInteger(1, 5)),
   author: getRandomArrayElement(CREATORS),
   date: Date.now() - getRandomInteger(0, 30 * 24 * 60 * 60 * 1000),
 });
@@ -129,6 +129,7 @@ const generateFilm = () => ({
   isWatched: getRandomBool(),
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
+  emojiSrc: ``,
   id: ``
 });
 

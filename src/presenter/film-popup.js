@@ -8,6 +8,7 @@ export default class FilmPopup {
     this._film = film;
     this._changeData = changeData;
 
+    this._closePopup = this._closePopup.bind(this);
     this._onPopupCloseKeyDown = this._onPopupCloseKeyDown.bind(this);
   }
 
@@ -23,7 +24,6 @@ export default class FilmPopup {
   _closePopup() {
     let popup = document.querySelector(`.film-details`);
     popup.remove();
-
     document.removeEventListener(`keydown`, this._onPopupCloseKeyDown);
   }
 
