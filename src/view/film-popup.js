@@ -225,12 +225,11 @@ const createFilmPopup = (data) => {
 export default class FilmPopup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
     this._data = FilmPopup.parseFilmToData(film);
 
-    this._isInWatchlist = film.inWatchlist;
-    this._isinHistory = film.isWatched;
-    this._isFavorite = film.isFavorite;
+    this._isInWatchlist = this._data.inWatchlist;
+    this._isinHistory = this._data.isWatched;
+    this._isFavorite = this._data.isFavorite;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
