@@ -2,8 +2,6 @@ import {updateItem} from "../utils/common.js";
 
 import {
   FILMS_COUNT_PER_STEP,
-  SPECIAL_CARDS_COUNT,
-  EXTRA_SECTIONS,
   SORTING_ENTRIES
 } from "../const.js";
 
@@ -17,7 +15,6 @@ import Sort from "../view/sorting-panel.js";
 
 import FilmsListSection from "../view/films-list-section.js";
 import CardsContainer from "../view/cards-container.js";
-import SpecialSection from "../view/special-section.js";
 import ShowMoreButton from "../view/show-more-button.js";
 import CardPresenter from "../presenter/film-card.js";
 import Filter from "../view/filter";
@@ -28,7 +25,9 @@ export default class FilmList {
   constructor(indexMain) {
     this._indexMain = indexMain;
     this._sortingComponent = new Sort();
-    this._cardsContainerComponent = new CardsContainer();
+
+    this._mainCardsContainerComponent = new CardsContainer();
+
     this._showMoreButtonComponent = new ShowMoreButton();
     this._cardPresenter = {};
 
@@ -38,6 +37,7 @@ export default class FilmList {
   init(films, filters) {
     this._films = films.slice();
     this._sourcedFilms = films.slice();
+
     this._filters = filters;
     this._filtersComponent = new Filter(this._filters);
 
@@ -47,25 +47,12 @@ export default class FilmList {
     this._filmsListComponent = new FilmsListSection(this._films.length);
     render(this._indexMain, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._renderMainFilmList(this._films);
-    this._renderSpecialFilmList(EXTRA_SECTIONS.top, this._sortFilmsByRating(films));
-    this._renderSpecialFilmList(EXTRA_SECTIONS.commented, this._sortFilmsByComments(films));
   }
 
   // Сортируем фильмы по рейтингу
   _sortFilmsByRating(films) {
     return films.slice().sort((left, right) => {
       let rankDiff = right.rating - left.rating;
-      if (rankDiff === 0) {
-        rankDiff = films.indexOf(left) - films.indexOf(right);
-      }
-      return rankDiff;
-    });
-  }
-
-  // Сортируем фильмы по количеству комментариев
-  _sortFilmsByComments(films) {
-    return films.slice().sort((left, right) => {
-      let rankDiff = right.comments.length - left.comments.length;
       if (rankDiff === 0) {
         rankDiff = films.indexOf(left) - films.indexOf(right);
       }
@@ -163,6 +150,7 @@ export default class FilmList {
   _handleFilmChange(updatedFilm) {
     this._films = updateItem(this._films, updatedFilm);
     this._sourcedFilms = updateItem(this._sourcedFilms, updatedFilm);
+    this._cardPresenter[updatedFilm.id].init(updatedFilm);
   }
 
   // Рендеринг карточек
@@ -186,7 +174,7 @@ export default class FilmList {
 
     this._showMoreButtonComponent.setClickHandler((evt) => {
       evt.preventDefault();
-      this._renderCards(this._cardsContainerComponent, films, renderedFilmsCount, Math.min(films.length, renderedFilmsCount + FILMS_COUNT_PER_STEP));
+      this._renderCards(this._mainCardsContainerComponent, films, renderedFilmsCount, Math.min(films.length, renderedFilmsCount + FILMS_COUNT_PER_STEP));
 
       renderedFilmsCount += FILMS_COUNT_PER_STEP;
 
@@ -199,8 +187,8 @@ export default class FilmList {
   // Основная секция фильмов
   _renderMainFilmList(films) {
     const filmsList = this._filmsListComponent.getElement().querySelector(`.films-list`);
-    render(filmsList, this._cardsContainerComponent, RenderPosition.BEFOREEND);
-    this._renderCards(this._cardsContainerComponent, films, 0, Math.min(films.length, FILMS_COUNT_PER_STEP));
+    render(filmsList, this._mainCardsContainerComponent, RenderPosition.BEFOREEND);
+    this._renderCards(this._mainCardsContainerComponent, films, 0, Math.min(films.length, FILMS_COUNT_PER_STEP));
 
     if (films.length > FILMS_COUNT_PER_STEP) {
       this._renderShowMoreButton(filmsList, films);
@@ -210,21 +198,9 @@ export default class FilmList {
   }
 
   _clearMainFilmList() {
-    const cardsContainer = this._cardsContainerComponent.getElement();
-    while (cardsContainer.firstChild) {
-      cardsContainer.removeChild(cardsContainer.firstChild);
+    const mainContainer = this._mainCardsContainerComponent.getElement();
+    while (mainContainer.firstChild) {
+      mainContainer.removeChild(mainContainer.firstChild);
     }
-  }
-
-  // Секции особых фильмов
-  _renderSpecialFilmList(sectionTitle, specialFilms) {
-    const cardSection = INDEX_MAIN.querySelector(`.films`);
-    render(cardSection, new SpecialSection(sectionTitle), RenderPosition.BEFOREEND);
-
-    const specialSection = cardSection.lastChild;
-    render(specialSection, new CardsContainer(), RenderPosition.BEFOREEND);
-
-    const specialCardsContainer = specialSection.querySelector(`.films-list__container`);
-    this._renderCards(specialCardsContainer, specialFilms, 0, Math.min(specialFilms.length, SPECIAL_CARDS_COUNT));
   }
 }

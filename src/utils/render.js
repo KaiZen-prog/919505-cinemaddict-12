@@ -39,3 +39,15 @@ export const remove = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
+
+export const replace = (newChild, id) => {
+  newChild = newChild.getElement();
+  const oldChildren = document.querySelectorAll(`.film-card`);
+
+  oldChildren.forEach((oldChild) => {
+    if (oldChild.dataset.id === id) {
+      let parent = oldChild.parentElement;
+      parent.replaceChild(newChild, oldChild);
+    }
+  });
+};

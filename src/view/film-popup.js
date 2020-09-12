@@ -1,4 +1,4 @@
-import SmartView from "./smart.js";
+import Card from "./card.js";
 import {MONTHS} from '../const.js';
 
 const getEmoji = (emojiSrc) => {
@@ -100,7 +100,6 @@ const createFilmPopup = (data) => {
 
     return commentsList;
   };
-
 
   return (
     `<section class="film-details">
@@ -222,23 +221,7 @@ const createFilmPopup = (data) => {
   );
 };
 
-export default class FilmPopup extends SmartView {
-  constructor(film) {
-    super();
-    this._data = FilmPopup.parseFilmToData(film);
-
-    this._isInWatchlist = this._data.inWatchlist;
-    this._isinHistory = this._data.isWatched;
-    this._isFavorite = this._data.isFavorite;
-
-    this._clickHandler = this._clickHandler.bind(this);
-    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
-    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
-    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
-
-    this._setInnerHandlers();
-  }
-
+export default class FilmPopup extends Card {
   getTemplate() {
     return createFilmPopup(this._data);
   }
@@ -274,57 +257,9 @@ export default class FilmPopup extends SmartView {
     });
   }
 
-  restoreHandlers() {
-    this.setClickHandler(this._callback.click);
-    this._setInnerHandlers();
-  }
-
-  _clickHandler(evt) {
-    evt.preventDefault();
-    this._callback.click(evt);
-  }
-
   setClickHandler(callback) {
     this._callback.click = callback;
-
     let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
     closeButton.addEventListener(`click`, this._clickHandler);
-  }
-
-  _addToWatchListHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchListClick(evt);
-  }
-
-  _addToHistoryHandler(evt) {
-    evt.preventDefault();
-    this._callback.historyClick(evt);
-  }
-
-  _addToFavoritesHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoritesClick(evt);
-  }
-
-  static parseFilmToData(film) {
-    return Object.assign(
-        {},
-        film,
-        {
-          poster: film.poster,
-          ageLimit: film.ageLimit,
-          title: film.title,
-          rating: film.rating,
-          director: film.director,
-          writers: film.writers,
-          actors: film.actors,
-          releaseDate: film.releaseDate,
-          duration: film.duration,
-          country: film.country,
-          genres: film.genres,
-          description: film.description,
-          comments: film.comments,
-          emojiSrc: film.emojiSrc
-        });
   }
 }

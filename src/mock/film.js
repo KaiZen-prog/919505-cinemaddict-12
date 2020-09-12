@@ -137,7 +137,8 @@ export const getFilms = () => {
   const films = [];
   for (let i = 0; i < FILMS_QUANTITY; i++) {
     let newFilm = generateFilm();
-    newFilm.id = `film-` + i;
+    let id = i + 1;
+    newFilm.id = `film-` + id;
     films.push(newFilm);
   }
 
