@@ -6,6 +6,11 @@ const toggleClassName = (string) =>
     ? ` main-navigation__item--active`
     : ``;
 
+const toggleFilmsQuantity = (filters, filter) =>
+  filter === FILTER_ENTRIES.ALL
+    ? ``
+    : `<span class="main-navigation__item-count">${filters[filter].length}</span>`;
+
 
 const generateFilterElements = (filters) => {
   let filtersList = ``;
@@ -16,7 +21,7 @@ const generateFilterElements = (filters) => {
 
       filtersList +=
         `<a href="#${filter}" class="main-navigation__item${isActive}" data-filter="${filter}">
-            ${filter}<span class="main-navigation__item-count">${filters[filter].length}</span>
+            ${filter}${toggleFilmsQuantity(filters, filter)}
         </a>`;
     }
   }
