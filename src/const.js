@@ -1,6 +1,6 @@
 const KEY_CODE_ESCAPE = 27;
 
-const FILMS_QUANTITY = 3;
+const FILMS_QUANTITY = 20;
 const FILMS_COUNT_PER_STEP = 5;
 const SPECIAL_CARDS_COUNT = 2;
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -11,20 +11,14 @@ const CLICKABLE_CARD_ELEMENTS = {
   A: `A`
 };
 
-const MONTHS = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`
-];
+const SORTING_OPTION_CLASSES = {
+  ACTIVE: `sort__button--active`,
+  PASSIVE: `sort__button`,
+};
+
+const FILTER_OPTION_CLASSES = {
+  ACTIVE: `main-navigation__item--active`
+};
 
 const FILTER_ENTRIES = {
   ALL: `All movies`,
@@ -51,7 +45,8 @@ export {
   SPECIAL_CARDS_COUNT,
   MAX_DESCRIPTION_LENGTH,
   CLICKABLE_CARD_ELEMENTS,
-  MONTHS,
+  SORTING_OPTION_CLASSES,
+  FILTER_OPTION_CLASSES,
   FILTER_ENTRIES,
   SORTING_ENTRIES,
   EXTRA_SECTIONS

@@ -3,6 +3,8 @@ import {updateItem} from "../utils/common.js";
 import {
   FILMS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
+  SORTING_OPTION_CLASSES,
+  FILTER_OPTION_CLASSES,
   EXTRA_SECTIONS,
   SORTING_ENTRIES
 } from "../const.js";
@@ -48,9 +50,9 @@ export default class FilmList {
     this._topFilms = this._sortFilmsByRating(this._films);
     this._mostCommentedFilms = this._sortFilmsByComments(this._films);
 
-    this._filters = generateFilter(this._films);
-    this._filtersComponent = new Filter(this._filters);
     this._activeFilter = FILTER_ENTRIES.ALL;
+    this._filters = generateFilter(this._films);
+    this._filtersComponent = new Filter(this._filters, this._activeFilter);
 
     this._renderFilterPanel();
     this._renderSortingPanel();
@@ -117,36 +119,30 @@ export default class FilmList {
   // Панель фильтрации
   _renderFilterPanel() {
     const onFilterClick = (evt) => {
-      if (this._isButtonChanged(this._filtersComponent, evt.target, `main-navigation__item--active`)) {
+      if (this._isButtonChanged(this._filtersComponent, evt.target, FILTER_OPTION_CLASSES.ACTIVE)) {
         this._activeFilter = evt.target.dataset.filter;
-        renderFilteredFilms();
+        this._renderFilteredFilms();
       }
     };
 
-    const renderFilteredFilms = () => {
-      this._currentFilms = this._filters[this._activeFilter];
-      this._renderMainFilmList(this._currentFilms);
-      this._resetSortingPanel();
-    };
-
     render(INDEX_MAIN, this._filtersComponent, RenderPosition.AFTERBEGIN);
-    if (this._activeFilter !== FILTER_ENTRIES.ALL) {
-      this._clearMainFilmList();
-      renderFilteredFilms();
-      const oldFilter = document.querySelector(`.main-navigation__item--active`);
-      const newFilter = document.querySelector(`[data-filter ="` + this._activeFilter + `"]`);
-      this._toggleButtons(oldFilter, newFilter, `main-navigation__item--active`);
-    }
 
     this._filtersComponent.setClickHandler((evt) => {
       onFilterClick(evt);
     });
   }
 
+  // Вывод в главный список только тех фильмов, которые проходят выбранный фильтр
+  _renderFilteredFilms() {
+    this._currentFilms = this._filters[this._activeFilter];
+    this._renderMainFilmList(this._currentFilms);
+    this._resetSortingPanel();
+  }
+
   // Панель сортировки
   _renderSortingPanel() {
     const onSortingChange = (evt) => {
-      if (this._isButtonChanged(this._sortingComponent, evt.target, `sort__button--active`)) {
+      if (this._isButtonChanged(this._sortingComponent, evt.target, SORTING_OPTION_CLASSES.ACTIVE)) {
         const sortedFilms = this._getSortedFilms(evt.target.dataset.sortBtn);
         this._renderMainFilmList(sortedFilms);
       }
@@ -182,12 +178,12 @@ export default class FilmList {
   }
 
   _resetSortingPanel() {
-    const sortingOptions = document.querySelectorAll(`.sort__button`);
+    const sortingOptions = document.querySelectorAll(`.` + SORTING_OPTION_CLASSES.PASSIVE);
     sortingOptions.forEach((sortingOption) => {
       if (sortingOption.dataset.sortBtn === SORTING_ENTRIES.DEFAULT) {
-        sortingOption.classList.add(`sort__button--active`);
+        sortingOption.classList.add(SORTING_OPTION_CLASSES.ACTIVE);
       } else {
-        sortingOption.classList.remove(`sort__button--active`);
+        sortingOption.classList.remove(SORTING_OPTION_CLASSES.ACTIVE);
       }
     });
   }
@@ -202,16 +198,17 @@ export default class FilmList {
     this._filters = generateFilter(this._films);
 
     this._clearAllFilmLists();
-    this._renderCards(this._mainCardsContainerComponent, this._films, 0, Math.min(this._films.length, FILMS_COUNT_PER_STEP));
+
+    this._renderFilteredFilms();
     this._renderCards(this._topCardsContainerComponent, this._topFilms, 0, Math.min(this._topFilms.length, SPECIAL_CARDS_COUNT));
     this._renderCards(this._mostCommentedCardsContainerComponent, this._mostCommentedFilms, 0, Math.min(this._mostCommentedFilms.length, SPECIAL_CARDS_COUNT));
 
     const filmsList = this._filmsListComponent.getElement().querySelector(`.films-list`);
     this._isShowMoreButtonNeeded(filmsList, this._films);
 
-    this._activeFilter = document.querySelector(`.main-navigation__item--active`).dataset.filter;
+    this._activeFilter = document.querySelector(`.` + FILTER_OPTION_CLASSES.ACTIVE).dataset.filter;
     this._clearFilterPanel();
-    this._filtersComponent = new Filter(this._filters);
+    this._filtersComponent = new Filter(this._filters, this._activeFilter);
     this._renderFilterPanel();
   }
 
@@ -229,25 +226,26 @@ export default class FilmList {
   }
 
   // Кнопка Show more
-  _renderShowMoreButton(container, films) {
+  _renderShowMoreButton(container) {
     let renderedFilmsCount = FILMS_COUNT_PER_STEP;
 
     render(container, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     this._showMoreButtonComponent.setClickHandler((evt) => {
       evt.preventDefault();
-      this._renderCards(this._mainCardsContainerComponent, films, renderedFilmsCount, Math.min(films.length, renderedFilmsCount + FILMS_COUNT_PER_STEP));
+      this._renderCards(this._mainCardsContainerComponent, this._currentFilms, renderedFilmsCount, Math.min(this._currentFilms.length, renderedFilmsCount + FILMS_COUNT_PER_STEP));
 
       renderedFilmsCount += FILMS_COUNT_PER_STEP;
 
-      if (renderedFilmsCount >= films.length) {
+      if (renderedFilmsCount >= this._currentFilms.length) {
         remove(this._showMoreButtonComponent);
       }
     });
   }
-  _isShowMoreButtonNeeded(filmsList, films) {
-    if (films.length > FILMS_COUNT_PER_STEP) {
-      this._renderShowMoreButton(filmsList, films);
+
+  _isShowMoreButtonNeeded(filmsList) {
+    if (this._currentFilms.length > FILMS_COUNT_PER_STEP) {
+      this._renderShowMoreButton(filmsList);
     } else {
       remove(this._showMoreButtonComponent);
     }
@@ -269,6 +267,7 @@ export default class FilmList {
     }
   }
 
+  // Методы очистки блоков при смене их содержания
   _clearAllFilmLists() {
     const mainContainer = this._mainCardsContainerComponent.getElement();
     const topContainer = this._topCardsContainerComponent.getElement();

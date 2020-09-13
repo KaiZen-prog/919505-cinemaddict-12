@@ -1,5 +1,8 @@
 import Card from "./card.js";
-import {MONTHS} from '../const.js';
+
+import {
+  formatFilmReleaseDate
+} from "../utils/film.js";
 
 const getEmoji = (emojiSrc) => {
   if (emojiSrc !== ``) {
@@ -26,15 +29,6 @@ const createFilmPopup = (data) => {
     comments,
     emojiSrc
   } = data;
-
-  // Приводим дату выхода к требуемому виду
-  const setReleaseDate = function () {
-    const day = releaseDate.getDate();
-    const month = MONTHS[releaseDate.getMonth() + 1];
-    const year = releaseDate.getFullYear();
-
-    return day + ` ` + month + ` ` + year;
-  };
 
   // Заполняем жанры
   const renderGenresList = function () {
@@ -142,7 +136,7 @@ const createFilmPopup = (data) => {
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Release Date</td>
-                    <td class="film-details__cell">${setReleaseDate()}</td>
+                    <td class="film-details__cell">${formatFilmReleaseDate(releaseDate)}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Runtime</td>

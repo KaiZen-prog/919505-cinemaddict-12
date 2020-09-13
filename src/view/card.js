@@ -1,6 +1,10 @@
 import {MAX_DESCRIPTION_LENGTH} from "../const.js";
 import SmartView from "./smart.js";
 
+import {
+  formatFilmReleaseYear
+} from "../utils/film.js";
+
 const createCard = (film) => {
   const {
     title,
@@ -38,7 +42,7 @@ const createCard = (film) => {
         <p class="film-card__info">isWatched: ${isWatched}</p>
         <p class="film-card__info">isFavorite: ${isFavorite}</p>
         <p class="film-card__info">
-            <span class="film-card__year">${releaseDate.getFullYear()}</span>
+            <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
             <span class="film-card__duration">${duration}</span>
             <span class="film-card__genre">${genres}</span>
         </p>
