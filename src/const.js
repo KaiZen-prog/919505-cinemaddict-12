@@ -12,8 +12,8 @@ const CLICKABLE_CARD_ELEMENTS = {
 };
 
 const SORTING_OPTION_CLASSES = {
+  DEFAULT: `sort__button`,
   ACTIVE: `sort__button--active`,
-  PASSIVE: `sort__button`,
 };
 
 const FILTER_OPTION_CLASSES = {

@@ -178,7 +178,7 @@ export default class FilmList {
   }
 
   _resetSortingPanel() {
-    const sortingOptions = document.querySelectorAll(`.` + SORTING_OPTION_CLASSES.PASSIVE);
+    const sortingOptions = document.querySelectorAll(`.` + SORTING_OPTION_CLASSES.DEFAULT);
     sortingOptions.forEach((sortingOption) => {
       if (sortingOption.dataset.sortBtn === SORTING_ENTRIES.DEFAULT) {
         sortingOption.classList.add(SORTING_OPTION_CLASSES.ACTIVE);
