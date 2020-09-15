@@ -1,7 +1,11 @@
 import {MAX_DESCRIPTION_LENGTH} from "../const.js";
-import Abstract from "./abstract";
+import SmartView from "./smart.js";
 
-const createCard = (film, filmId) => {
+import {
+  formatFilmReleaseYear
+} from "../utils/film.js";
+
+const createCard = (film) => {
   const {
     title,
     rating,
@@ -10,7 +14,11 @@ const createCard = (film, filmId) => {
     genres,
     poster,
     comments,
-    description
+    description,
+    inWatchlist,
+    isWatched,
+    isFavorite,
+    id,
   } = film;
 
   let commentsLinkTitle;
@@ -26,11 +34,15 @@ const createCard = (film, filmId) => {
   }
 
   return (
-    `<article id="${filmId}" class="film-card">
+    `<article data-id="${id}" class="film-card">
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
+        <p class="film-card__info"></p>
+        <p class="film-card__info">inWatchlist: ${inWatchlist}</p>
+        <p class="film-card__info">isWatched: ${isWatched}</p>
+        <p class="film-card__info">isFavorite: ${isFavorite}</p>
         <p class="film-card__info">
-            <span class="film-card__year">${releaseDate.getFullYear()}</span>
+            <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
             <span class="film-card__duration">${duration}</span>
             <span class="film-card__genre">${genres}</span>
         </p>
@@ -46,17 +58,19 @@ const createCard = (film, filmId) => {
   );
 };
 
-export default class Card extends Abstract {
-  constructor(film, filmId) {
+export default class Card extends SmartView {
+  constructor(film, changeData) {
     super();
     this._film = film;
-    this._filmId = filmId;
+    this._data = Card.parseFilmToData(this._film);
+    this._changeData = changeData;
 
     this._clickHandler = this._clickHandler.bind(this);
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createCard(this._film, this._filmId);
+    return createCard(this._film);
   }
 
   _clickHandler(evt) {
@@ -67,5 +81,50 @@ export default class Card extends Abstract {
   setClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().addEventListener(`click`, this._clickHandler);
+  }
+
+  _setInnerHandlers() {
+    const element = this.getElement();
+    element.querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._changeData(Object.assign({}, this._film, {inWatchlist: !this._film.inWatchlist}));
+    });
+
+    element.querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._changeData(Object.assign({}, this._film, {isWatched: !this._film.isWatched}));
+    });
+
+    element.querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._changeData(Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}));
+    });
+  }
+
+  restoreHandlers() {
+    this.setClickHandler(this._callback.click);
+    this._setInnerHandlers();
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+        {},
+        film,
+        {
+          poster: film.poster,
+          ageLimit: film.ageLimit,
+          title: film.title,
+          rating: film.rating,
+          director: film.director,
+          writers: film.writers,
+          actors: film.actors,
+          releaseDate: film.releaseDate,
+          duration: film.duration,
+          country: film.country,
+          genres: film.genres,
+          description: film.description,
+          comments: film.comments,
+          emojiSrc: film.emojiSrc
+        });
   }
 }

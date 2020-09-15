@@ -1,7 +1,18 @@
-import {MONTHS} from '../const.js';
-import Abstract from "./abstract";
+import Card from "./card.js";
 
-const createFilmPopup = (film) => {
+import {
+  formatFilmReleaseDate
+} from "../utils/film.js";
+
+const getEmoji = (emojiSrc) => {
+  if (emojiSrc !== ``) {
+    return `<img src="${emojiSrc}" width="55" height="55" alt="emoji">`;
+  } else {
+    return ``;
+  }
+};
+
+const createFilmPopup = (data) => {
   const {
     poster,
     ageLimit,
@@ -15,17 +26,9 @@ const createFilmPopup = (film) => {
     country,
     genres,
     description,
-    comments
-  } = film;
-
-  // Приводим дату выхода к требуемому виду
-  const setReleaseDate = function () {
-    const day = releaseDate.getDate();
-    const month = MONTHS[releaseDate.getMonth() + 1];
-    const year = releaseDate.getFullYear();
-
-    return day + ` ` + month + ` ` + year;
-  };
+    comments,
+    emojiSrc
+  } = data;
 
   // Заполняем жанры
   const renderGenresList = function () {
@@ -133,7 +136,7 @@ const createFilmPopup = (film) => {
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Release Date</td>
-                    <td class="film-details__cell">${setReleaseDate()}</td>
+                    <td class="film-details__cell">${formatFilmReleaseDate(releaseDate)}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Runtime</td>
@@ -175,7 +178,9 @@ const createFilmPopup = (film) => {
               </ul>
 
               <div class="film-details__new-comment">
-                <div for="add-emoji" class="film-details__add-emoji-label"></div>
+                <div for="add-emoji" class="film-details__add-emoji-label">
+                    ${getEmoji(emojiSrc)}
+                </div>
 
                 <label class="film-details__comment-label">
                   <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -210,26 +215,44 @@ const createFilmPopup = (film) => {
   );
 };
 
-export default class FilmPopup extends Abstract {
-  constructor(film) {
-    super();
-    this._film = film;
-
-    this._clickHandler = this._clickHandler.bind(this);
-  }
-
+export default class FilmPopup extends Card {
   getTemplate() {
-    return createFilmPopup(this._film);
+    return createFilmPopup(this._data);
   }
 
-  _clickHandler(evt) {
-    evt.preventDefault();
-    this._callback.click(evt);
+  _setInnerHandlers() {
+    const element = this.getElement();
+
+    element.querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isInWatchlist = !this._isInWatchlist;
+      this.updateElement();
+    });
+
+    element.querySelector(`.film-details__control-label--watched`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isinHistory = !this._isinHistory;
+      this.updateElement();
+    });
+
+    element.querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._isFavorite = !this._isFavorite;
+      this.updateElement();
+    });
+
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `IMG`) {
+        evt.preventDefault();
+        this.updateData({
+          emojiSrc: evt.target.src
+        });
+      }
+    });
   }
 
   setClickHandler(callback) {
     this._callback.click = callback;
-
     let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
     closeButton.addEventListener(`click`, this._clickHandler);
   }

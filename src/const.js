@@ -11,20 +11,14 @@ const CLICKABLE_CARD_ELEMENTS = {
   A: `A`
 };
 
-const MONTHS = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`
-];
+const SORTING_OPTION_CLASSES = {
+  DEFAULT: `sort__button`,
+  ACTIVE: `sort__button--active`,
+};
+
+const FILTER_OPTION_CLASSES = {
+  ACTIVE: `main-navigation__item--active`
+};
 
 const FILTER_ENTRIES = {
   ALL: `All movies`,
@@ -51,7 +45,8 @@ export {
   SPECIAL_CARDS_COUNT,
   MAX_DESCRIPTION_LENGTH,
   CLICKABLE_CARD_ELEMENTS,
-  MONTHS,
+  SORTING_OPTION_CLASSES,
+  FILTER_OPTION_CLASSES,
   FILTER_ENTRIES,
   SORTING_ENTRIES,
   EXTRA_SECTIONS
