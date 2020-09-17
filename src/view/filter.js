@@ -6,27 +6,27 @@ const toggleClassName = (string, currentFilter) =>
     ? ` main-navigation__item--active`
     : ``;
 
-const toggleFilmsQuantity = (filters, filter) =>
+const toggleFilmsQuantity = (count, filter) =>
   filter === FILTER_ENTRIES.ALL
     ? ``
-    : `<span class="main-navigation__item-count">${filters[filter].length}</span>`;
+    : `<span class="main-navigation__item-count">${count}</span>`;
+
+const createFilterItemTemplate = (filter, currentFilter) => {
+  const {type, count} = filter;
+
+  let isActive = toggleClassName(type, currentFilter);
+  return (
+    `<a href="#${filter}" class="main-navigation__item${isActive}" data-filter="${type}">
+            ${type}${toggleFilmsQuantity(count, type)}
+        </a>`
+  );
+};
 
 
 const generateFilterElements = (filters, currentFilter) => {
-  let filtersList = ``;
-
-  for (let filter in filters) {
-    if (filters.hasOwnProperty(filter)) {
-      let isActive = toggleClassName(filter, currentFilter);
-
-      filtersList +=
-        `<a href="#${filter}" class="main-navigation__item${isActive}" data-filter="${filter}">
-            ${filter}${toggleFilmsQuantity(filters, filter)}
-        </a>`;
-    }
-  }
-
-  return filtersList;
+  return filters
+    .map((filter) => createFilterItemTemplate(filter, currentFilter))
+    .join(``);
 };
 
 const createFilterTemplate = (filters, currentFilter) => {
@@ -46,20 +46,20 @@ export default class Filter extends Abstract {
     this._filters = filters;
     this._currentFilter = currentFilter;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
     return createFilterTemplate(this._filters, this._currentFilter);
   }
 
-  _clickHandler(evt) {
+  _filterTypeChangeHandler(evt) {
     evt.preventDefault();
-    this._callback.click(evt);
+    this._callback.filterTypeChange(evt.target.dataset.filter);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().addEventListener(`click`, this._clickHandler);
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener(`click`, this._filterTypeChangeHandler);
   }
 }

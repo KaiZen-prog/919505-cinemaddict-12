@@ -1,5 +1,5 @@
 import CardView from "../view/card.js";
-import {render, replace, remove, RenderPosition} from "../utils/render.js";
+import {render, replaceCard, remove, RenderPosition} from "../utils/render.js";
 import {CLICKABLE_CARD_ELEMENTS} from "../const";
 import FilmPopupPresenter from "./film-popup";
 
@@ -26,7 +26,7 @@ export default class FilmCard {
     }
 
     if (this._cardContainer.getElement().contains(prevCardComponent.getElement())) {
-      replace(this._cardComponent, this._film.id);
+      replaceCard(this._cardComponent, this._film.id);
     } else {
       render(this._cardContainer, this._cardComponent, RenderPosition.BEFOREEND);
     }

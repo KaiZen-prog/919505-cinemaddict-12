@@ -1,18 +1,22 @@
 import {SORTING_ENTRIES} from "../const.js";
 import Abstract from "./abstract";
 
-const generateSortingList = () => {
+
+const toggleClassName = (string, currentSort) =>
+  string === currentSort
+    ? ` sort__button--active`
+    : ``;
+
+const generateSortingList = (currentSortType) => {
   let sortingList = ``;
 
   for (let entry in SORTING_ENTRIES) {
     if ({}.hasOwnProperty.call(SORTING_ENTRIES, entry)) {
-      const isActive = SORTING_ENTRIES[entry] === `Sort by default`
-        ? ` sort__button--active`
-        : ``;
+      let isActive = toggleClassName(SORTING_ENTRIES[entry], currentSortType);
 
       sortingList +=
         `<li>
-        <a href="#" class="sort__button${isActive}" data-sort-btn="${SORTING_ENTRIES[entry]}">${SORTING_ENTRIES[entry]}</a>
+        <a href="#" class="sort__button${isActive}" data-sort-type="${SORTING_ENTRIES[entry]}">${SORTING_ENTRIES[entry]}</a>
       </li>`;
     }
   }
@@ -20,33 +24,39 @@ const generateSortingList = () => {
   return sortingList;
 };
 
-const createSortTemplate = () => {
+const createSortTemplate = (currentSortType) => {
   return (
     `<ul class="sort">
-        ${generateSortingList()}
+        ${generateSortingList(currentSortType)}
     </ul>`
   );
 };
 
 export default class Sort extends Abstract {
-  constructor() {
+  constructor(currentSortType) {
     super();
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._currentSortType = currentSortType;
+
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createSortTemplate();
+    return createSortTemplate(this._currentSortType);
   }
 
-  _clickHandler(evt) {
+  _sortTypeChangeHandler(evt) {
+    if (evt.target.tagName !== `A`) {
+      return;
+    }
+
     evt.preventDefault();
-    this._callback.click(evt);
+    this._callback.sortingTypeChange(evt.target.dataset.sortType);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().addEventListener(`click`, this._clickHandler);
+  setSortingTypeChangeHandler(callback) {
+    this._callback.sortingTypeChange = callback;
+    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
   }
 }
 

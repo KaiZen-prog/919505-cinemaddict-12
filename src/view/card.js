@@ -1,5 +1,10 @@
-import {MAX_DESCRIPTION_LENGTH} from "../const.js";
 import SmartView from "./smart.js";
+
+import {
+  MAX_DESCRIPTION_LENGTH,
+  USER_ACTION,
+  UPDATE_TYPE
+} from "../const.js";
 
 import {
   formatFilmReleaseYear
@@ -87,7 +92,17 @@ export default class Card extends SmartView {
     const element = this.getElement();
     element.querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {inWatchlist: !this._film.inWatchlist}));
+      this._changeData(
+          USER_ACTION.UPDATE_FILM,
+          UPDATE_TYPE.MAJOR,
+          Object.assign(
+              {},
+              this._film,
+              {
+                inWatchlist: !this._film.inWatchlist
+              }
+          )
+      );
     });
 
     element.querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, (evt) => {
