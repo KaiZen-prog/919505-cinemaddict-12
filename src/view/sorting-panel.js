@@ -1,62 +1,44 @@
-import {SORTING_ENTRIES} from "../const.js";
-import Abstract from "./abstract";
+import AbstractView from "./abstract";
+import {SORTING_ENTRIES, CLICKABLE_HTML_ELEMENTS, SORTING_OPTION_CLASSES} from "../const";
 
-
-const toggleClassName = (string, currentSort) =>
-  string === currentSort
-    ? ` sort__button--active`
-    : ``;
-
-const generateSortingList = (currentSortType) => {
-  let sortingList = ``;
-
-  for (let entry in SORTING_ENTRIES) {
-    if ({}.hasOwnProperty.call(SORTING_ENTRIES, entry)) {
-      let isActive = toggleClassName(SORTING_ENTRIES[entry], currentSortType);
-
-      sortingList +=
-        `<li>
-        <a href="#" class="sort__button${isActive}" data-sort-type="${SORTING_ENTRIES[entry]}">${SORTING_ENTRIES[entry]}</a>
-      </li>`;
-    }
-  }
-
-  return sortingList;
-};
-
-const createSortTemplate = (currentSortType) => {
+const createMainSortTemplate = () => {
   return (
     `<ul class="sort">
-        ${generateSortingList(currentSortType)}
+      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.DEFAULT}">Sort by default</a></li>
+      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.DATE}">Sort by date</a></li>
+      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.RATING}">Sort by rating</a></li>
     </ul>`
   );
 };
 
-export default class Sort extends Abstract {
-  constructor(currentSortType) {
+export default class SortView extends AbstractView {
+  constructor() {
     super();
-
-    this._currentSortType = currentSortType;
-
-    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this._callback = {};
+    this._sortTypeHandler = this._sortTypeHandler.bind(this);
   }
-
   getTemplate() {
-    return createSortTemplate(this._currentSortType);
+    return createMainSortTemplate();
   }
 
-  _sortTypeChangeHandler(evt) {
-    if (evt.target.tagName !== `A`) {
+  _sortTypeHandler(evt) {
+    if (evt.target.tagName !== CLICKABLE_HTML_ELEMENTS.A) {
       return;
     }
-
     evt.preventDefault();
-    this._callback.sortingTypeChange(evt.target.dataset.sortType);
+    this._callback.sort(evt.target.dataset.sortType);
+
+    const sortButtonsElements = this.getElement().querySelectorAll(`.sort__button`);
+    sortButtonsElements.forEach((currentElement) => {
+      if (currentElement.classList.contains(`sort__button--active`)) {
+        currentElement.classList.remove(`sort__button--active`);
+      }
+    });
+    evt.target.classList.add(`sort__button--active`);
   }
 
   setSortingTypeChangeHandler(callback) {
-    this._callback.sortingTypeChange = callback;
-    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
+    this._callback.sort = callback;
+    this.getElement().addEventListener(`click`, this._sortTypeHandler);
   }
 }
-

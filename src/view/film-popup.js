@@ -1,8 +1,5 @@
-import Card from "./card.js";
-
-import {
-  formatFilmReleaseDate
-} from "../utils/film.js";
+import SmartView from "./smart.js";
+import {formatFilmReleaseDate} from "../utils/film.js";
 
 const getEmoji = (emojiSrc) => {
   if (emojiSrc !== ``) {
@@ -215,32 +212,26 @@ const createFilmPopup = (data) => {
   );
 };
 
-export default class FilmPopup extends Card {
+export default class FilmPopup extends SmartView {
+  constructor(film, changeData) {
+    super(film, changeData);
+    this._data = FilmPopup.parseFilmToData(film);
+    this._changeData = changeData;
+
+    this._popupCloseHandler = this._popupCloseHandler.bind(this);
+    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
+    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
   getTemplate() {
     return createFilmPopup(this._data);
   }
 
   _setInnerHandlers() {
     const element = this.getElement();
-
-    element.querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._isInWatchlist = !this._isInWatchlist;
-      this.updateElement();
-    });
-
-    element.querySelector(`.film-details__control-label--watched`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._isinHistory = !this._isinHistory;
-      this.updateElement();
-    });
-
-    element.querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._isFavorite = !this._isFavorite;
-      this.updateElement();
-    });
-
     element.querySelector(`.film-details__emoji-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `IMG`) {
         evt.preventDefault();
@@ -251,9 +242,74 @@ export default class FilmPopup extends Card {
     });
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setPopupCloseHandler(this._callback.popupClose);
+    this.setAddToWatchListHandler(this._callback.addToWatchListClick);
+    this.setAddToHistoryHandler(this._callback.addToHistoryClick);
+    this.setAddToFavoritesHandler(this._callback.addToFavoritesClick);
+  }
+
+  _popupCloseHandler(evt) {
+    evt.preventDefault();
+    this._callback.popupClose(evt);
+  }
+
+  _addToWatchListHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToWatchListClick(evt);
+  }
+
+  setAddToWatchListHandler(callback) {
+    this._callback.addToWatchListClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._addToWatchListHandler);
+  }
+
+  _addToHistoryHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToHistoryClick(evt);
+  }
+
+  setAddToHistoryHandler(callback) {
+    this._callback.addToHistoryClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._addToHistoryHandler);
+  }
+
+  _addToFavoritesHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToFavoritesClick(evt);
+  }
+
+  setAddToFavoritesHandler(callback) {
+    this._callback.addToFavoritesClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
+  }
+
+  setPopupCloseHandler(callback) {
+    this._callback.popupClose = callback;
     let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
-    closeButton.addEventListener(`click`, this._clickHandler);
+    closeButton.addEventListener(`click`, this._popupCloseHandler);
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign({}, film, {
+      director: film.director,
+      writers: film.writers,
+      actors: film.actors,
+      poster: film.poster,
+      rating: film.rating,
+      releaseDate: film.releaseDate,
+      country: film.country,
+      duration: film.duration,
+      genres: film.genres,
+      ageLimit: film.ageLimit,
+      description: film.description,
+      inWatchlist: film.inWatchlist,
+      isWatched: film.isWatched,
+      isFavorite: film.isFavorite,
+      comments: film.comments,
+      emojiSrc: film.emojiSrc,
+      id: film.id,
+    });
   }
 }

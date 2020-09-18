@@ -1,14 +1,6 @@
 import SmartView from "./smart.js";
-
-import {
-  MAX_DESCRIPTION_LENGTH,
-  USER_ACTION,
-  UPDATE_TYPE
-} from "../const.js";
-
-import {
-  formatFilmReleaseYear
-} from "../utils/film.js";
+import {MAX_DESCRIPTION_LENGTH} from "../const.js";
+import {formatFilmReleaseYear} from "../utils/film.js";
 
 const createCard = (film) => {
   const {
@@ -71,6 +63,9 @@ export default class Card extends SmartView {
     this._changeData = changeData;
 
     this._clickHandler = this._clickHandler.bind(this);
+    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
+    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -89,31 +84,39 @@ export default class Card extends SmartView {
   }
 
   _setInnerHandlers() {
-    const element = this.getElement();
-    element.querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(
-          USER_ACTION.UPDATE_FILM,
-          UPDATE_TYPE.MAJOR,
-          Object.assign(
-              {},
-              this._film,
-              {
-                inWatchlist: !this._film.inWatchlist
-              }
-          )
-      );
-    });
+  }
 
-    element.querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {isWatched: !this._film.isWatched}));
+  _addToWatchListHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      description: evt.target.value
     });
+    this._callback.addToWatchListClick(evt);
+  }
 
-    element.querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}));
-    });
+  setAddToWatchListHandler(callback) {
+    this._callback.addToWatchListClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addToWatchListHandler);
+  }
+
+  _addToHistoryHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToHistoryClick(evt);
+  }
+
+  setAddToHistoryHandler(callback) {
+    this._callback.addToHistoryClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, this._addToHistoryHandler);
+  }
+
+  _addToFavoritesHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToFavoritesClick(evt);
+  }
+
+  setAddToFavoritesHandler(callback) {
+    this._callback.addToFavoritesClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
   }
 
   restoreHandlers() {
@@ -138,6 +141,9 @@ export default class Card extends SmartView {
           country: film.country,
           genres: film.genres,
           description: film.description,
+          inWatchlist: film.inWatchlist,
+          isWatched: film.isWatched,
+          isFavorite: film.isFavorite,
           comments: film.comments,
           emojiSrc: film.emojiSrc
         });
