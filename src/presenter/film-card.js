@@ -1,14 +1,13 @@
 import CardView from "../view/card.js";
-import {render, replaceCard, remove, RenderPosition} from "../utils/render.js";
-import {CLICKABLE_HTML_ELEMENTS, USER_ACTION, UPDATE_TYPE} from "../const";
 import FilmPopupView from "../view/film-popup.js";
+import {render, replace, remove, RenderPosition} from "../utils/render.js";
+import {USER_ACTION, UPDATE_TYPE} from "../const";
 import {isEscapeDown} from "../utils/common";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
-  EDITING: `EDITING`
+  POPUP: `POPUP`
 };
-
 
 const INDEX_BODY = document.querySelector(`body`);
 
@@ -17,13 +16,13 @@ export default class FilmCard {
     this._cardContainer = cardContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+
     this._cardComponent = null;
     this._popupComponent = null;
     this._mode = Mode.DEFAULT;
 
-    this._handleClick = this._handleClick.bind(this);
-
-    this._handlePopupClose = this._handlePopupClose.bind(this);
+    this._handlePopupOpenClick = this._handlePopupOpenClick.bind(this);
+    this._handlePopupCloseClick = this._handlePopupCloseClick.bind(this);
     this._onPopupCloseKeyDown = this._onPopupCloseKeyDown.bind(this);
 
     this._handleAddToWatchlistClick = this._handleAddToWatchlistClick.bind(this);
@@ -33,123 +32,90 @@ export default class FilmCard {
 
   init(film) {
     this._film = film;
-    const prevCardComponent = this._cardComponent;
 
-    this._cardComponent = new CardView(this._film, this._changeData);
+    const prevFilmComponent = this._cardComponent;
+    const prevFilmPopupComponent = this._popupComponent;
 
-    this._cardComponent.setClickHandler(this._handleClick);
-    this._cardComponent.setAddToWatchListHandler(this._handleAddToWatchlistClick);
-    this._cardComponent.setAddToHistoryHandler(this._handleAddToHistoryClick);
-    this._cardComponent.setAddToFavoritesHandler(this._handleAddToFavoritesClick);
+    this._cardComponent = new CardView(this._film);
+    this._popupComponent = new FilmPopupView(this._film);
 
-    if (prevCardComponent === null) {
+    this._cardComponent.setClickHandler(this._handlePopupOpenClick);
+    this._cardComponent.setAddToWatchlistClickHandler(this._handleAddToWatchlistClick);
+    this._cardComponent.setAddToHistoryClickHandler(this._handleAddToHistoryClick);
+    this._cardComponent.setAddToFavoritesClickHandler(this._handleAddToFavoritesClick);
+
+    if (prevFilmComponent === null) {
       render(this._cardContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
     }
 
-    if (this._cardContainer.getElement().contains(prevCardComponent.getElement())) {
-      replaceCard(this._cardComponent, this._film.id);
-    } else {
-      render(this._cardContainer, this._cardComponent, RenderPosition.BEFOREEND);
+    if (this._mode === Mode.DEFAULT) {
+      replace(this._cardComponent, prevFilmComponent);
     }
 
-    this.resetView();
-    remove(prevCardComponent);
+    if (this._mode === Mode.POPUP) {
+      replace(this._popupComponent, prevFilmPopupComponent);
+    }
+
+    remove(prevFilmComponent);
+    remove(prevFilmPopupComponent);
   }
 
   // Обработчики закрытия попапа
-  _handlePopupClose() {
-    let popup = document.querySelector(`.film-details`);
-    popup.remove();
+  _removePopupComponent() {
+    remove(this._popupComponent);
     document.removeEventListener(`keydown`, this._onPopupCloseKeyDown);
     this._mode = Mode.DEFAULT;
   }
 
   _onPopupCloseKeyDown(evt) {
     if (isEscapeDown(evt)) {
-      this._handlePopupClose();
+      evt.preventDefault();
+      this._removePopupComponent();
+      this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film));
     }
   }
 
-  resetView() {
-    if (this._mode === Mode.EDITING) {
-      remove(this._popupComponent);
-      this._renderPopup();
-    }
-  }
+  _handlePopupOpenClick() {
+    render(INDEX_BODY, this._popupComponent, RenderPosition.AFTERBEGIN);
 
-  _renderPopup() {
-    this._popupComponent = new FilmPopupView(this._film, this._changeData);
-    render(INDEX_BODY, this._popupComponent, RenderPosition.BEFOREEND);
-
-    this._popupComponent.setPopupCloseHandler(this._handlePopupClose);
-    this._popupComponent.setAddToWatchListHandler(this._handleAddToWatchlistClick);
-    this._popupComponent.setAddToHistoryHandler(this._handleAddToHistoryClick);
-    this._popupComponent.setAddToFavoritesHandler(this._handleAddToFavoritesClick);
     document.addEventListener(`keydown`, this._onPopupCloseKeyDown);
-
+    this._popupComponent.setClosePopupHandler(this._handlePopupCloseClick);
     this._changeMode();
-    this._mode = Mode.EDITING;
-    this._prevPopupComponent = this._popupComponent;
+    this._mode = Mode.POPUP;
   }
 
-  // Обработчик клика по карточке
-  _handleClick(evt) {
-    if (CLICKABLE_HTML_ELEMENTS.hasOwnProperty(evt.target.tagName)) {
-      this._renderPopup();
-    }
+  _handlePopupCloseClick(film) {
+    this._removePopupComponent();
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film));
   }
 
   _handleAddToWatchlistClick() {
-    this._changeData(
-        USER_ACTION.UPDATE_FILM,
-        UPDATE_TYPE.MAJOR,
-        Object.assign(
-            {},
-            this._film,
-            {
-              inWatchlist: !this._film.inWatchlist
-            }
-        )
-    );
-    this.resetView();
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+      inWatchlist: !this._film.inWatchlist
+    }));
   }
 
   _handleAddToHistoryClick() {
-    this._changeData(
-        USER_ACTION.UPDATE_FILM,
-        UPDATE_TYPE.MAJOR,
-        Object.assign(
-            {},
-            this._film,
-            {
-              isWatched: !this._film.isWatched
-            }
-        )
-    );
-    this.resetView();
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+      isWatched: !this._film.isWatched
+    }));
   }
 
   _handleAddToFavoritesClick() {
-    this._changeData(
-        USER_ACTION.UPDATE_FILM,
-        UPDATE_TYPE.MAJOR,
-        Object.assign(
-            {},
-            this._film,
-            {
-              isFavorite: !this._film.isFavorite
-            }
-        )
-    );
-    this.resetView();
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+      isFavorite: !this._film.isFavorite
+    }));
   }
 
   destroy() {
     remove(this._cardComponent);
+    remove(this._popupComponent);
+  }
 
-    if (this._popupComponent !== null) {
-      remove(this._popupComponent);
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._removePopupComponent();
     }
   }
 }

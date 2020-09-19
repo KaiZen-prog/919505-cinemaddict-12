@@ -1,44 +1,59 @@
 import AbstractView from "./abstract";
-import {SORTING_ENTRIES, CLICKABLE_HTML_ELEMENTS, SORTING_OPTION_CLASSES} from "../const";
+import {SORTING_ENTRIES} from "../const";
 
-const createMainSortTemplate = () => {
+const createMainSortTemplate = (currentSortType) => {
   return (
     `<ul class="sort">
-      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.DEFAULT}">Sort by default</a></li>
-      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.DATE}">Sort by date</a></li>
-      <li><a href="#" class="${SORTING_OPTION_CLASSES.DEFAULT}" data-sort-type="${SORTING_ENTRIES.RATING}">Sort by rating</a></li>
+      <li>
+        <a href="#"
+           class="sort__button ${currentSortType === SORTING_ENTRIES.DEFAULT ? `sort__button--active` : ``}"
+           data-sort-type="${SORTING_ENTRIES.DEFAULT}">
+           Sort by default
+        </a>
+      </li>
+
+      <li>
+        <a href="#"
+           class="sort__button ${currentSortType === SORTING_ENTRIES.DATE ? `sort__button--active` : ``}"
+           data-sort-type="${SORTING_ENTRIES.DATE}">
+           Sort by date
+        </a>
+      </li>
+
+      <li>
+        <a href="#"
+           class="sort__button ${currentSortType === SORTING_ENTRIES.RATING ? `sort__button--active` : ``}"
+           data-sort-type="${SORTING_ENTRIES.RATING}">
+           Sort by rating
+        </a>
+      </li>
     </ul>`
   );
 };
 
 export default class SortView extends AbstractView {
-  constructor() {
+  constructor(currentSortType) {
     super();
-    this._callback = {};
-    this._sortTypeHandler = this._sortTypeHandler.bind(this);
-  }
-  getTemplate() {
-    return createMainSortTemplate();
+    this._currentSortType = currentSortType;
+
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
-  _sortTypeHandler(evt) {
-    if (evt.target.tagName !== CLICKABLE_HTML_ELEMENTS.A) {
+  getTemplate() {
+    return createMainSortTemplate(this._currentSortType);
+  }
+
+  _sortTypeChangeHandler(evt) {
+    if (evt.target.tagName !== `A`) {
       return;
     }
-    evt.preventDefault();
-    this._callback.sort(evt.target.dataset.sortType);
 
-    const sortButtonsElements = this.getElement().querySelectorAll(`.sort__button`);
-    sortButtonsElements.forEach((currentElement) => {
-      if (currentElement.classList.contains(`sort__button--active`)) {
-        currentElement.classList.remove(`sort__button--active`);
-      }
-    });
-    evt.target.classList.add(`sort__button--active`);
+    evt.preventDefault();
+    this._callback.sortTypeChange(evt.target.dataset.sortType);
   }
 
-  setSortingTypeChangeHandler(callback) {
-    this._callback.sort = callback;
-    this.getElement().addEventListener(`click`, this._sortTypeHandler);
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
   }
 }

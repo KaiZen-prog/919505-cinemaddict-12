@@ -8,7 +8,7 @@ const createSpecialSection = (title) => {
   );
 };
 
-export default class SpecialSection extends Abstract {
+export default class FilmListSectionExtra extends Abstract {
   constructor(title) {
     super();
     this._title = title;

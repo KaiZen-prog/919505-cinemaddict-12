@@ -23,6 +23,9 @@ const createFilmPopup = (data) => {
     country,
     genres,
     description,
+    inWatchlist,
+    isWatched,
+    isFavorite,
     comments,
     emojiSrc
   } = data;
@@ -54,6 +57,19 @@ const createFilmPopup = (data) => {
 
     return timeString;
   };
+
+  // Активируем инпуты
+  const isInWatchList = inWatchlist
+    ? `checked`
+    : ``;
+
+  const isInHistory = isWatched
+    ? `checked`
+    : ``;
+
+  const isInFavorites = isFavorite
+    ? `checked`
+    : ``;
 
   // Заполняем комментарии
   const renderCommentsList = function () {
@@ -155,13 +171,13 @@ const createFilmPopup = (data) => {
             </div>
 
             <section class="film-details__controls">
-              <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+              <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isInWatchList}>
               <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-              <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+              <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isInHistory}>
               <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-              <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+              <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${isInFavorites}>
               <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
             </section>
           </div>
@@ -213,15 +229,15 @@ const createFilmPopup = (data) => {
 };
 
 export default class FilmPopup extends SmartView {
-  constructor(film, changeData) {
-    super(film, changeData);
+  constructor(film) {
+    super();
     this._data = FilmPopup.parseFilmToData(film);
-    this._changeData = changeData;
 
-    this._popupCloseHandler = this._popupCloseHandler.bind(this);
-    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._closePopupHandler = this._closePopupHandler.bind(this);
+    this._addToWatchlistHandler = this._addToWatchlistHandler.bind(this);
     this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
     this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
+    this._addEmojiHandler = this._addEmojiHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -230,86 +246,64 @@ export default class FilmPopup extends SmartView {
     return createFilmPopup(this._data);
   }
 
-  _setInnerHandlers() {
-    const element = this.getElement();
-    element.querySelector(`.film-details__emoji-list`).addEventListener(`click`, (evt) => {
-      if (evt.target.tagName === `IMG`) {
-        evt.preventDefault();
-        this.updateData({
-          emojiSrc: evt.target.src
-        });
-      }
-    });
-  }
-
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setPopupCloseHandler(this._callback.popupClose);
-    this.setAddToWatchListHandler(this._callback.addToWatchListClick);
-    this.setAddToHistoryHandler(this._callback.addToHistoryClick);
-    this.setAddToFavoritesHandler(this._callback.addToFavoritesClick);
+    this.setClosePopupHandler(this._callback.closePopup);
   }
 
-  _popupCloseHandler(evt) {
+  _setInnerHandlers() {
+    const element = this.getElement();
+    element.querySelector(`#watchlist`).addEventListener(`click`, this._addToWatchlistHandler);
+    element.querySelector(`#watched`).addEventListener(`click`, this._addToHistoryHandler);
+    element.querySelector(`#favorite`).addEventListener(`click`, this._addToFavoritesHandler);
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, this._addEmojiHandler);
+  }
+
+  _addToWatchlistHandler(evt) {
     evt.preventDefault();
-    this._callback.popupClose(evt);
-  }
-
-  _addToWatchListHandler(evt) {
-    evt.preventDefault();
-    this._callback.addToWatchListClick(evt);
-  }
-
-  setAddToWatchListHandler(callback) {
-    this._callback.addToWatchListClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._addToWatchListHandler);
+    this.updateData({
+      inWatchlist: !this._data.inWatchlist
+    });
   }
 
   _addToHistoryHandler(evt) {
     evt.preventDefault();
-    this._callback.addToHistoryClick(evt);
-  }
-
-  setAddToHistoryHandler(callback) {
-    this._callback.addToHistoryClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._addToHistoryHandler);
+    this.updateData({
+      isWatched: !this._data.isWatched
+    });
   }
 
   _addToFavoritesHandler(evt) {
     evt.preventDefault();
-    this._callback.addToFavoritesClick(evt);
+    this.updateData({
+      isFavorite: !this._data.isFavorite
+    });
   }
 
-  setAddToFavoritesHandler(callback) {
-    this._callback.addToFavoritesClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
+  _addEmojiHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      currentComment: Object.assign({}, this._data.currentComment, {
+        emoji: evt.target.value
+      })
+    });
   }
 
-  setPopupCloseHandler(callback) {
-    this._callback.popupClose = callback;
-    let closeButton = this.getElement().querySelector(`.film-details__close-btn`);
-    closeButton.addEventListener(`click`, this._popupCloseHandler);
+  _closePopupHandler(evt) {
+    evt.preventDefault();
+    this._callback.closePopup(FilmPopup.parseDataToFilm(this._data));
+  }
+
+  setClosePopupHandler(callback) {
+    this._callback.closePopup = callback;
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._closePopupHandler);
   }
 
   static parseFilmToData(film) {
-    return Object.assign({}, film, {
-      director: film.director,
-      writers: film.writers,
-      actors: film.actors,
-      poster: film.poster,
-      rating: film.rating,
-      releaseDate: film.releaseDate,
-      country: film.country,
-      duration: film.duration,
-      genres: film.genres,
-      ageLimit: film.ageLimit,
-      description: film.description,
-      inWatchlist: film.inWatchlist,
-      isWatched: film.isWatched,
-      isFavorite: film.isFavorite,
-      comments: film.comments,
-      emojiSrc: film.emojiSrc,
-      id: film.id,
-    });
+    return Object.assign({}, film);
+  }
+
+  static parseDataToFilm(data) {
+    return Object.assign({}, data);
   }
 }

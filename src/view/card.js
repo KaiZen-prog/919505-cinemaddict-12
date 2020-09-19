@@ -1,5 +1,5 @@
-import SmartView from "./smart.js";
-import {MAX_DESCRIPTION_LENGTH} from "../const.js";
+import Abstract from "./abstract.js";
+import {MAX_DESCRIPTION_LENGTH, CLICKABLE_HTML_ELEMENTS} from "../const.js";
 import {formatFilmReleaseYear} from "../utils/film.js";
 
 const createCard = (film) => {
@@ -30,14 +30,22 @@ const createCard = (film) => {
     filmDescription = description.substring(0, MAX_DESCRIPTION_LENGTH - 1) + `...`;
   }
 
+  const isInWatchList = inWatchlist
+    ? `film-card__controls-item--active`
+    : ``;
+
+  const isInHistory = isWatched
+    ? `film-card__controls-item--active`
+    : ``;
+
+  const isInFavorites = isFavorite
+    ? `film-card__controls-item--active`
+    : ``;
+
   return (
     `<article data-id="${id}" class="film-card">
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
-        <p class="film-card__info"></p>
-        <p class="film-card__info">inWatchlist: ${inWatchlist}</p>
-        <p class="film-card__info">isWatched: ${isWatched}</p>
-        <p class="film-card__info">isFavorite: ${isFavorite}</p>
         <p class="film-card__info">
             <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
             <span class="film-card__duration">${duration}</span>
@@ -47,26 +55,22 @@ const createCard = (film) => {
         <p class="film-card__description">${filmDescription}</p>
         <a class="film-card__comments">${commentsLinkTitle}</a>
         <form class="film-card__controls">
-            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-            <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+            <button class="film-card__controls-item button ${isInWatchList} film-card__controls-item--add-to-watchlist">Add to watchlist</button>
+            <button class="film-card__controls-item button ${isInHistory} film-card__controls-item--mark-as-watched">Mark as watched</button>
+            <button class="film-card__controls-item button ${isInFavorites} film-card__controls-item--favorite">Mark as favorite</button>
         </form>
     </article>`
   );
 };
 
-export default class Card extends SmartView {
-  constructor(film, changeData) {
+export default class Card extends Abstract {
+  constructor(film) {
     super();
     this._film = film;
-    this._data = Card.parseFilmToData(this._film);
-    this._changeData = changeData;
-
     this._clickHandler = this._clickHandler.bind(this);
     this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
     this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
     this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
-    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -75,7 +79,9 @@ export default class Card extends SmartView {
 
   _clickHandler(evt) {
     evt.preventDefault();
-    this._callback.click(evt);
+    if (CLICKABLE_HTML_ELEMENTS.hasOwnProperty(evt.target.tagName)) {
+      this._callback.click(evt);
+    }
   }
 
   setClickHandler(callback) {
@@ -83,69 +89,33 @@ export default class Card extends SmartView {
     this.getElement().addEventListener(`click`, this._clickHandler);
   }
 
-  _setInnerHandlers() {
-  }
-
   _addToWatchListHandler(evt) {
     evt.preventDefault();
-    this.updateData({
-      description: evt.target.value
-    });
-    this._callback.addToWatchListClick(evt);
+    this._callback.addToWatchListClick();
   }
 
-  setAddToWatchListHandler(callback) {
+  setAddToWatchlistClickHandler(callback) {
     this._callback.addToWatchListClick = callback;
     this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addToWatchListHandler);
   }
 
   _addToHistoryHandler(evt) {
     evt.preventDefault();
-    this._callback.addToHistoryClick(evt);
+    this._callback.addToHistoryClick();
   }
 
-  setAddToHistoryHandler(callback) {
+  setAddToHistoryClickHandler(callback) {
     this._callback.addToHistoryClick = callback;
     this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, this._addToHistoryHandler);
   }
 
   _addToFavoritesHandler(evt) {
     evt.preventDefault();
-    this._callback.addToFavoritesClick(evt);
+    this._callback.addToFavoritesClick();
   }
 
-  setAddToFavoritesHandler(callback) {
+  setAddToFavoritesClickHandler(callback) {
     this._callback.addToFavoritesClick = callback;
     this.getElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
-  }
-
-  restoreHandlers() {
-    this.setClickHandler(this._callback.click);
-    this._setInnerHandlers();
-  }
-
-  static parseFilmToData(film) {
-    return Object.assign(
-        {},
-        film,
-        {
-          poster: film.poster,
-          ageLimit: film.ageLimit,
-          title: film.title,
-          rating: film.rating,
-          director: film.director,
-          writers: film.writers,
-          actors: film.actors,
-          releaseDate: film.releaseDate,
-          duration: film.duration,
-          country: film.country,
-          genres: film.genres,
-          description: film.description,
-          inWatchlist: film.inWatchlist,
-          isWatched: film.isWatched,
-          isFavorite: film.isFavorite,
-          comments: film.comments,
-          emojiSrc: film.emojiSrc
-        });
   }
 }

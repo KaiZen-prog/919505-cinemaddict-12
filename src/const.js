@@ -1,6 +1,6 @@
 const KEY_CODE_ESCAPE = 27;
 
-const FILMS_QUANTITY = 20;
+const FILMS_QUANTITY = 3;
 const FILMS_COUNT_PER_STEP = 5;
 const SPECIAL_CARDS_COUNT = 2;
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -47,7 +47,14 @@ const USER_ACTION = {
 const UPDATE_TYPE = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
+};
+
+const PROFILE_RATING = {
+  NOVICE: `novice`,
+  FAN: `fan`,
+  MOVIE_BUFF: `movie buff`
 };
 
 export {
@@ -63,5 +70,6 @@ export {
   SORTING_ENTRIES,
   EXTRA_SECTIONS,
   USER_ACTION,
-  UPDATE_TYPE
+  UPDATE_TYPE,
+  PROFILE_RATING
 };
