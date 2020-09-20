@@ -38,6 +38,10 @@ export default class FilmList {
     this._filterModel = filterModel;
     this._main = container;
     this._currentSortType = SORTING_ENTRIES.DEFAULT;
+    this._renderedFilmCount = FILMS_COUNT_PER_STEP;
+
+    this._sortComponent = null;
+    this._showMoreButtonComponent = null;
 
     this._loadingComponent = new Loading();
     this._noFilmComponent = new NoFilm();
@@ -61,16 +65,13 @@ export default class FilmList {
     this._handleModeChange = this._handleModeChange.bind(this);
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
-    render(this._main, this._mainFilmListSectionComponent, RenderPosition.BEFOREEND);
-    render(this._mainFilmListSectionComponent, this._mainFilmListComponent, RenderPosition.AFTERBEGIN);
-    render(this._mainFilmListComponent, this._mainCardsContainerComponent, RenderPosition.AFTERBEGIN);
-
     this._renderFilmSection();
   }
 
@@ -123,6 +124,12 @@ export default class FilmList {
   }
 
   _renderFilmSection() {
+    this._renderSort();
+
+    render(this._main, this._mainFilmListSectionComponent, RenderPosition.BEFOREEND);
+    render(this._mainFilmListSectionComponent, this._mainFilmListComponent, RenderPosition.AFTERBEGIN);
+    render(this._mainFilmListComponent, this._mainCardsContainerComponent, RenderPosition.AFTERBEGIN);
+
     const films = this._getFilms();
 
     if (films.length === 0) {
@@ -130,15 +137,40 @@ export default class FilmList {
       return;
     }
 
-    this._renderSort();
-    this._renderFilms(films.slice(0, Math.min(films.length, FILMS_COUNT_PER_STEP)));
+    this._renderFilms(films.slice(0, Math.min(films.length, this._renderedFilmCount)));
 
-    if (films.length > FILMS_COUNT_PER_STEP) {
+    if (films.length > this._renderedFilmCount) {
       this._renderShowMoreButton();
     }
+
     this._renderFilmsExtra(films);
     this._renderFilmsMost(films);
     this._renderProfileRating(films);
+    this._renderFooterStat();
+  }
+
+  _renderShowMoreButton() {
+    if (this._showMoreButtonComponent !== null) {
+      this._showMoreButtonComponent = null;
+    }
+    this._showMoreButtonComponent = new ShowMoreButton();
+    this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
+
+    render(this._mainFilmListComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
+  }
+
+  _handleShowMoreButtonClick() {
+    const films = this._getFilms();
+
+    const newRenderedFilmCount = Math.min(films.length, this._renderedFilmCount + FILMS_COUNT_PER_STEP);
+    const newFilmsToRender = films.slice(this._renderedFilmCount, newRenderedFilmCount);
+
+    this._renderFilms(newFilmsToRender);
+    this._renderedFilmCount = newRenderedFilmCount;
+
+    if (this._renderedFilmCount >= films.length) {
+      remove(this._showMoreButtonComponent);
+    }
   }
 
   _renderProfileRating(films) {
@@ -204,13 +236,13 @@ export default class FilmList {
     this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
-    render(this._main, this._sortComponent, RenderPosition.AFTERBEGIN);
+    render(this._main, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _renderFooterStat() {
     const films = this._filmsModel.getFilms();
-    const stat = new StatisticsSection(films.length);
-    render(STAT_SECTION, stat, RenderPosition.BEFOREEND);
+    this._footerStatComponent = new StatisticsSection(films.length);
+    render(STAT_SECTION, this._footerStatComponent, RenderPosition.BEFOREEND);
   }
 
   // Сортируем фильмы по рейтингу
@@ -272,16 +304,17 @@ export default class FilmList {
 
     remove(this._profile);
     remove(this._sortComponent);
+    remove(this._mainFilmListSectionComponent);
+    remove(this._mainFilmListComponent);
+    remove(this._mainCardsContainerComponent);
     remove(this._noFilmComponent);
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);
+    remove(this._footerStatComponent);
 
     if (resetRenderedFilmCount) {
       this._renderedFilmCount = FILMS_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this._renderedFilmCount = Math.min(filmCount, this._renderedFilmCount);
     }
 

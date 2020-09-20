@@ -234,6 +234,7 @@ export default class FilmPopup extends SmartView {
     this._data = FilmPopup.parseFilmToData(film);
 
     this._closePopupHandler = this._closePopupHandler.bind(this);
+
     this._addToWatchlistHandler = this._addToWatchlistHandler.bind(this);
     this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
     this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
@@ -292,6 +293,11 @@ export default class FilmPopup extends SmartView {
   _closePopupHandler(evt) {
     evt.preventDefault();
     this._callback.closePopup(FilmPopup.parseDataToFilm(this._data));
+  }
+
+  setClosePopupKeydownHandler(callback) {
+    this._callback.closePopupKeydown = callback;
+    document.addEventListener(`keydown`, this._closePopupHandler);
   }
 
   setClosePopupHandler(callback) {

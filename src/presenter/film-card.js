@@ -23,7 +23,7 @@ export default class FilmCard {
 
     this._handlePopupOpenClick = this._handlePopupOpenClick.bind(this);
     this._handlePopupCloseClick = this._handlePopupCloseClick.bind(this);
-    this._onPopupCloseKeyDown = this._onPopupCloseKeyDown.bind(this);
+    this._handlePopupCloseKeyDown = this._handlePopupCloseKeyDown.bind(this);
 
     this._handleAddToWatchlistClick = this._handleAddToWatchlistClick.bind(this);
     this._handleAddToHistoryClick = this._handleAddToHistoryClick.bind(this);
@@ -61,33 +61,31 @@ export default class FilmCard {
     remove(prevFilmPopupComponent);
   }
 
-  // Обработчики закрытия попапа
-  _removePopupComponent() {
-    remove(this._popupComponent);
-    document.removeEventListener(`keydown`, this._onPopupCloseKeyDown);
-    this._mode = Mode.DEFAULT;
-  }
-
-  _onPopupCloseKeyDown(evt) {
-    if (isEscapeDown(evt)) {
-      evt.preventDefault();
-      this._removePopupComponent();
-      this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film));
-    }
-  }
-
   _handlePopupOpenClick() {
     render(INDEX_BODY, this._popupComponent, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener(`keydown`, this._onPopupCloseKeyDown);
     this._popupComponent.setClosePopupHandler(this._handlePopupCloseClick);
+    this._popupComponent.setClosePopupKeydownHandler(this._handlePopupCloseKeyDown);
     this._changeMode();
     this._mode = Mode.POPUP;
+  }
+
+  // Обработчики закрытия попапа
+  _removePopupComponent() {
+    remove(this._popupComponent);
+    this._mode = Mode.DEFAULT;
   }
 
   _handlePopupCloseClick(film) {
     this._removePopupComponent();
     this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film));
+  }
+
+  _handlePopupCloseKeyDown(evt, film) {
+    if (isEscapeDown(evt)) {
+      this._removePopupComponent();
+      this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film));
+    }
   }
 
   _handleAddToWatchlistClick() {
