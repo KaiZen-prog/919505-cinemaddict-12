@@ -1,4 +1,4 @@
-import FilmsPresenter from "./presenter/movie-list.js";
+import FilmsPresenter from "./presenter/board.js";
 import FilterPresenter from "./presenter/filter.js";
 
 import {getFilms} from "./mock/film.js";
@@ -14,7 +14,6 @@ filmsModel.setFilms(films);
 
 const filterModel = new FilterModel();
 
-// Презентер списков фильмов
 const filmsPresenter = new FilmsPresenter(INDEX_MAIN, filmsModel, filterModel);
 const filterPresenter = new FilterPresenter(INDEX_MAIN, filmsModel, filterModel);
 

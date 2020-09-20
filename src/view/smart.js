@@ -33,6 +33,20 @@ export default class Smart extends Abstract {
     this.restoreHandlers();
   }
 
+  updateComments(update) {
+    if (!update) {
+      return;
+    }
+    this._data.comments.push(update);
+    this.updateElement();
+  }
+
+  deleteComment(number) {
+    const index = number.split(`-`)[1];
+    this._data.comments.splice(index, 1);
+    this.updateElement();
+  }
+
   restoreHandlers() {
     throw new Error(`Abstract method not implemented: resetHandlers`);
   }

@@ -2,7 +2,6 @@ import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
 import {USER_ACTION, UPDATE_TYPE} from "../const";
-import {isEscapeDown} from "../utils/common";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -11,7 +10,7 @@ const Mode = {
 
 const INDEX_BODY = document.querySelector(`body`);
 
-export default class FilmCard {
+export default class Card {
   constructor(cardContainer, changeData, changeMode) {
     this._cardContainer = cardContainer;
     this._changeData = changeData;
@@ -78,14 +77,20 @@ export default class FilmCard {
 
   _handlePopupCloseClick(film) {
     this._removePopupComponent();
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film));
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film, {
+      currentComment: {
+        emoji: null
+      }
+    }));
   }
 
   _handlePopupCloseKeyDown(evt, film) {
-    if (isEscapeDown(evt)) {
-      this._removePopupComponent();
-      this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film));
-    }
+    this._removePopupComponent();
+    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film, {
+      currentComment: {
+        emoji: null
+      }
+    }));
   }
 
   _handleAddToWatchlistClick() {

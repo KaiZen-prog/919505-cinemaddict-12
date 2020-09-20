@@ -4,7 +4,8 @@ import {
   getRandomInteger,
   getRandomSet,
   addSpaceToStrings,
-  getRandomDate
+  getRandomDate,
+  generateId
 } from "../utils/common.js";
 
 import {FILMS_QUANTITY} from "../const";
@@ -32,10 +33,10 @@ const posters = [
 const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 
 const EMOJIS = [
-  `/images/emoji/angry.png`,
-  `/images/emoji/puke.png`,
-  `/images/emoji/sleeping.png`,
-  `/images/emoji/smile.png`
+  `angry`,
+  `puke`,
+  `sleeping`,
+  `smile`
 ];
 
 const GENRES = [
@@ -104,13 +105,24 @@ const setGenres = function () {
 };
 
 const generateComment = () => ({
-  emotion: getRandomArrayElement(EMOJIS),
-  text: description.split(`.`, getRandomInteger(1, 5)),
+  id: generateId(),
+  filmId: null,
+  emoji: getRandomArrayElement(EMOJIS),
+  text: description.split(`.`, getRandomInteger(1, 5)).toString(),
   author: getRandomArrayElement(CREATORS),
   date: Date.now() - getRandomInteger(0, 30 * 24 * 60 * 60 * 1000),
 });
 
 const getComments = (num) => Array.from({length: num}, generateComment);
+
+const generateCurrentComment = () => {
+  return {
+    text: null,
+    emoji: null,
+    author: null,
+    date: null
+  };
+};
 
 const generateFilm = () => ({
   title: getRandomArrayElement(titles),
@@ -124,11 +136,12 @@ const generateFilm = () => ({
   duration: getRandomDuration(),
   genres: setGenres(),
   ageLimit: getRandomArrayElement(AGE_LIMITS),
-  description: description.split(`.`, getRandomInteger(1, 5)),
+  description: description.split(`.`, getRandomInteger(1, 5)).toString(),
   inWatchlist: getRandomBool(),
   isWatched: getRandomBool(),
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
+  currentComment: generateCurrentComment(),
   emojiSrc: ``,
   id: ``
 });

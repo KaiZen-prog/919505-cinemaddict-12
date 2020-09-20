@@ -18,6 +18,7 @@ const createCard = (film) => {
     id,
   } = film;
 
+  // Редактируем заголовок блока с комментариями в зависимости от их числа
   let commentsLinkTitle;
   if (comments.length === 1) {
     commentsLinkTitle = comments.length + `comment`;
@@ -25,11 +26,13 @@ const createCard = (film) => {
     commentsLinkTitle = comments.length + `comments`;
   }
 
+  // Выставляем максимально допустимую длину описания фильма
   let filmDescription = description;
   if (description.length > MAX_DESCRIPTION_LENGTH) {
     filmDescription = description.substring(0, MAX_DESCRIPTION_LENGTH - 1) + `...`;
   }
 
+  // Выставляем активные/неактивные контролы
   const isInWatchList = inWatchlist
     ? `film-card__controls-item--active`
     : ``;

@@ -22,7 +22,6 @@ const createFilterItemTemplate = (filter, currentFilter) => {
   );
 };
 
-
 const generateFilterElements = (filters, currentFilter) => {
   return filters
     .map((filter) => createFilterItemTemplate(filter, currentFilter))
