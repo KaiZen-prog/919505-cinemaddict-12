@@ -17,10 +17,10 @@ const SORTING_ENTRIES = {
   RATING: `Sort by rating`,
 };
 
-const FILTER_OPTION_CLASSES = {
-  ACTIVE: `main-navigation__item--active`
+const CARD_MODE = {
+  DEFAULT: `DEFAULT`,
+  POPUP: `POPUP`
 };
-
 const FILTER_ENTRIES = {
   ALL: `All movies`,
   WATCHLIST: `Watchlist`,
@@ -43,7 +43,6 @@ const UPDATE_TYPE = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
-  INIT: `INIT`
 };
 
 const PROFILE_RATING = {
@@ -59,7 +58,7 @@ export {
   SPECIAL_CARDS_COUNT,
   MAX_DESCRIPTION_LENGTH,
   CLICKABLE_HTML_ELEMENTS,
-  FILTER_OPTION_CLASSES,
+  CARD_MODE,
   FILTER_ENTRIES,
   SORTING_ENTRIES,
   EXTRA_SECTIONS,

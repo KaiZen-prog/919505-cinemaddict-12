@@ -1,12 +1,7 @@
 import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
-import {USER_ACTION, UPDATE_TYPE} from "../const";
-
-const Mode = {
-  DEFAULT: `DEFAULT`,
-  POPUP: `POPUP`
-};
+import {USER_ACTION, UPDATE_TYPE, CARD_MODE} from "../const";
 
 const INDEX_BODY = document.querySelector(`body`);
 
@@ -18,7 +13,7 @@ export default class Card {
 
     this._cardComponent = null;
     this._popupComponent = null;
-    this._mode = Mode.DEFAULT;
+    this._mode = CARD_MODE.DEFAULT;
 
     this._handlePopupOpenClick = this._handlePopupOpenClick.bind(this);
     this._handlePopupCloseClick = this._handlePopupCloseClick.bind(this);
@@ -48,11 +43,11 @@ export default class Card {
       return;
     }
 
-    if (this._mode === Mode.DEFAULT) {
+    if (this._mode === CARD_MODE.DEFAULT) {
       replace(this._cardComponent, prevFilmComponent);
     }
 
-    if (this._mode === Mode.POPUP) {
+    if (this._mode === CARD_MODE.POPUP) {
       replace(this._popupComponent, prevFilmPopupComponent);
     }
 
@@ -66,13 +61,13 @@ export default class Card {
     this._popupComponent.setClosePopupHandler(this._handlePopupCloseClick);
     this._popupComponent.setClosePopupKeydownHandler(this._handlePopupCloseKeyDown);
     this._changeMode();
-    this._mode = Mode.POPUP;
+    this._mode = CARD_MODE.POPUP;
   }
 
   // Обработчики закрытия попапа
   _removePopupComponent() {
     remove(this._popupComponent);
-    this._mode = Mode.DEFAULT;
+    this._mode = CARD_MODE.DEFAULT;
   }
 
   _handlePopupCloseClick(film) {
@@ -93,6 +88,7 @@ export default class Card {
     }));
   }
 
+  // контролы
   _handleAddToWatchlistClick() {
     this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
       inWatchlist: !this._film.inWatchlist
@@ -111,13 +107,14 @@ export default class Card {
     }));
   }
 
+  // Удаление и перезапуск
   destroy() {
     remove(this._cardComponent);
     remove(this._popupComponent);
   }
 
   resetView() {
-    if (this._mode !== Mode.DEFAULT) {
+    if (this._mode !== CARD_MODE.DEFAULT) {
       this._removePopupComponent();
     }
   }

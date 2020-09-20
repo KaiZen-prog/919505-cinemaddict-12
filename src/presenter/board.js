@@ -120,11 +120,6 @@ export default class Board {
         });
         this.init();
         break;
-      case UPDATE_TYPE.INIT:
-        remove(this._loadingComponent);
-        this.init();
-        this._renderFooterStat();
-        break;
     }
   }
 
