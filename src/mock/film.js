@@ -8,7 +8,7 @@ import {
   generateId
 } from "../utils/common.js";
 
-import {FILMS_QUANTITY} from "../const";
+import {CARDS_QUANTITY} from "../const";
 
 const titles = [
   `Made for each other`,
@@ -148,7 +148,7 @@ const generateFilm = () => ({
 
 export const getFilms = () => {
   const films = [];
-  for (let i = 0; i < FILMS_QUANTITY; i++) {
+  for (let i = 0; i < CARDS_QUANTITY; i++) {
     let newFilm = generateFilm();
     let id = i + 1;
     newFilm.id = `film-` + id;
