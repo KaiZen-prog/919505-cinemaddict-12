@@ -1,7 +1,7 @@
 import FilterView from "../view/filter.js";
 import {render, RenderPosition, replace, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {FILTER_ENTRIES, UPDATE_TYPE} from "../const.js";
+import {FilterType, UpdateType} from "../const.js";
 
 export default class Filter {
   constructor(filterContainer, filmsModel, filterModel) {
@@ -46,7 +46,7 @@ export default class Filter {
       return;
     }
 
-    this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType);
+    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
   _getFilters() {
@@ -54,24 +54,24 @@ export default class Filter {
 
     return [
       {
-        type: FILTER_ENTRIES.ALL,
+        type: FilterType.ALL,
         name: `All`,
-        count: filter[FILTER_ENTRIES.ALL](films).length
+        count: filter[FilterType.ALL](films).length
       },
       {
-        type: FILTER_ENTRIES.WATCHLIST,
+        type: FilterType.WATCHLIST,
         name: `Watchlist`,
-        count: filter[FILTER_ENTRIES.WATCHLIST](films).length
+        count: filter[FilterType.WATCHLIST](films).length
       },
       {
-        type: FILTER_ENTRIES.HISTORY,
+        type: FilterType.HISTORY,
         name: `History`,
-        count: filter[FILTER_ENTRIES.HISTORY](films).length
+        count: filter[FilterType.HISTORY](films).length
       },
       {
-        type: FILTER_ENTRIES.FAVORITES,
+        type: FilterType.FAVORITES,
         name: `Favorites`,
-        count: filter[FILTER_ENTRIES.FAVORITES](films).length
+        count: filter[FilterType.FAVORITES](films).length
       }
     ];
   }

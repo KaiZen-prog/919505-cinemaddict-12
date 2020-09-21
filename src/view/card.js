@@ -1,5 +1,5 @@
 import Abstract from "./abstract.js";
-import {MAX_DESCRIPTION_LENGTH, CLICKABLE_HTML_ELEMENTS} from "../const.js";
+import {MAX_DESCRIPTION_LENGTH, ClickableHTMLElements} from "../const.js";
 import {formatFilmReleaseYear} from "../utils/film.js";
 
 const createCard = (film) => {
@@ -82,7 +82,7 @@ export default class Card extends Abstract {
 
   _clickHandler(evt) {
     evt.preventDefault();
-    if (CLICKABLE_HTML_ELEMENTS.hasOwnProperty(evt.target.tagName)) {
+    if (ClickableHTMLElements.hasOwnProperty(evt.target.tagName)) {
       this._callback.click(evt);
     }
   }

@@ -5,46 +5,51 @@ const CARDS_COUNT_PER_STEP = 5;
 const SPECIAL_CARDS_COUNT = 2;
 const MAX_DESCRIPTION_LENGTH = 140;
 
-const CLICKABLE_HTML_ELEMENTS = {
+const ClickableHTMLElements = {
   IMG: `IMG`,
   H3: `H3`,
   A: `A`
 };
 
-const SORTING_ENTRIES = {
+const SortingEntries = {
   DEFAULT: `Sort by default`,
   DATE: `Sort by date`,
   RATING: `Sort by rating`,
 };
 
-const CARD_MODE = {
+const CardMode = {
   DEFAULT: `DEFAULT`,
   POPUP: `POPUP`
 };
 
-const FILTER_ENTRIES = {
+const FilterType = {
   ALL: `All movies`,
   WATCHLIST: `Watchlist`,
   HISTORY: `History`,
   FAVORITES: `Favorites`
 };
 
-const EXTRA_SECTIONS = {
+const ExtraSections = {
   top: `Top rated`,
   commented: `Most commented`
 };
 
-const USER_ACTION = {
+const UserAction = {
   UPDATE_FILM: `UPDATE_FILM`
 };
 
-const UPDATE_TYPE = {
+const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
 };
 
-const PROFILE_RATING = {
+export const MenuItem = {
+  FILMS: `FILMS`,
+  STATISTICS: `STATISTICS`
+};
+
+const ProfileRating = {
   NOVICE: `novice`,
   FAN: `fan`,
   MOVIE_BUFF: `movie buff`
@@ -56,12 +61,12 @@ export {
   CARDS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
   MAX_DESCRIPTION_LENGTH,
-  CLICKABLE_HTML_ELEMENTS,
-  CARD_MODE,
-  FILTER_ENTRIES,
-  SORTING_ENTRIES,
-  EXTRA_SECTIONS,
-  USER_ACTION,
-  UPDATE_TYPE,
-  PROFILE_RATING
+  ClickableHTMLElements,
+  CardMode,
+  FilterType,
+  SortingEntries,
+  ExtraSections,
+  UserAction,
+  UpdateType,
+  ProfileRating
 };

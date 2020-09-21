@@ -40,18 +40,6 @@ export const remove = (component) => {
   component.removeElement();
 };
 
-export const replaceCard = (newChild, id) => {
-  newChild = newChild.getElement();
-  const oldChildren = document.querySelectorAll(`.film-card`);
-
-  oldChildren.forEach((oldChild) => {
-    if (oldChild.dataset.id === id) {
-      let parent = oldChild.parentElement;
-      parent.replaceChild(newChild, oldChild);
-    }
-  });
-};
-
 export const replace = (newChild, oldChild) => {
   if (oldChild instanceof Abstract) {
     oldChild = oldChild.getElement();

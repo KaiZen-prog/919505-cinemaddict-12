@@ -1,11 +1,11 @@
 import {
   CARDS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
-  EXTRA_SECTIONS,
-  FILTER_ENTRIES,
-  SORTING_ENTRIES,
-  USER_ACTION,
-  UPDATE_TYPE
+  ExtraSections,
+  FilterType,
+  SortingEntries,
+  UserAction,
+  UpdateType
 } from "../const.js";
 
 import {
@@ -17,9 +17,10 @@ import {
 import {filter} from "../utils/filter.js";
 
 import UserProfileView from '../view/user-profile';
+
 import NoFilmView from '../view/no-films';
 import LoadingView from '../view/loading';
-import SortView from "../view/sorting-panel.js";
+import SortView from "../view/sorting-panel";
 
 import FilmListSectionView from "../view/film-list-section.js";
 import MainFilmListView from "../view/film-list-main.js";
@@ -27,21 +28,19 @@ import FilmListSectionExtraView from "../view/film-list-section-extra.js";
 import CardsContainerView from "../view/card-container.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 
-import StatisticsSectionView from "../view/statistics.js";
-
 import CardPresenter from "./card.js";
 
 const INDEX_HEADER = document.querySelector(`.header`);
-const STAT_SECTION = document.querySelector(`.footer__statistics`);
 
 export default class Board {
   constructor(container, cardModel, filterModel) {
     this._cardModel = cardModel;
     this._filterModel = filterModel;
     this._mainContainerComponent = container;
-    this._currentSortType = SORTING_ENTRIES.DEFAULT;
+    this._currentSortType = SortingEntries.DEFAULT;
     this._renderedCardCount = CARDS_COUNT_PER_STEP;
 
+    this._userProfile = null;
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
 
@@ -52,10 +51,10 @@ export default class Board {
     this._mainCardListComponent = new MainFilmListView();
     this._mainCardsContainerComponent = new CardsContainerView();
 
-    this._topCardsListComponent = new FilmListSectionExtraView(EXTRA_SECTIONS.top);
+    this._topCardsListComponent = new FilmListSectionExtraView(ExtraSections.top);
     this._topCardsContainerComponent = new CardsContainerView();
 
-    this._mostCommentedCardsListComponent = new FilmListSectionExtraView(EXTRA_SECTIONS.commented);
+    this._mostCommentedCardsListComponent = new FilmListSectionExtraView(ExtraSections.commented);
     this._mostCommentedCardsContainerComponent = new CardsContainerView();
 
     this._showMoreButtonComponent = new ShowMoreButtonView();
@@ -68,12 +67,21 @@ export default class Board {
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
-
-    this._cardModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
+    this._cardModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
+    this._renderBoard();
+  }
+
+  // Рендеринг доски
+  _renderBoard() {
+    if (this._userProfile === null) {
+      this._renderProfileRating();
+    }
+
     this._renderSort();
 
     render(this._mainContainerComponent, this._mainCardListSectionComponent, RenderPosition.BEFOREEND);
@@ -95,14 +103,12 @@ export default class Board {
 
     this._renderFilmsExtra(films);
     this._renderFilmsMost(films);
-    this._renderProfileRating(films);
-    this._renderFooterStat();
   }
 
   // Обработчики изменения вида, модели и режима отображения карточки
   _handleViewAction(actionType, updateType, updatedFilm) {
     switch (actionType) {
-      case USER_ACTION.UPDATE_FILM:
+      case UserAction.UPDATE_FILM:
         this._cardModel.updateFilm(updateType, updatedFilm);
         break;
     }
@@ -110,15 +116,29 @@ export default class Board {
 
   _handleModelEvent(updateType) {
     switch (updateType) {
-      case UPDATE_TYPE.MINOR:
-        this._clearFilmSection();
-        this.init();
-        break;
-      case UPDATE_TYPE.MAJOR:
+      case UpdateType.PATCH:
         this._clearFilmSection({
-          resetRenderedFilmCount: true, resetSortType: true
+          resetRenderedFilmCount: true,
+          resetSortType: true,
+          resetUserProfile: false
         });
-        this.init();
+        this._renderBoard();
+        break;
+
+      case UpdateType.MINOR:
+        this._clearFilmSection({
+          resetUserProfile: true
+        });
+        this._renderBoard();
+        break;
+
+      case UpdateType.MAJOR:
+        this._clearFilmSection({
+          resetRenderedFilmCount: true,
+          resetSortType: true,
+          resetUserProfile: true
+        });
+        this._renderBoard();
         break;
     }
   }
@@ -136,19 +156,20 @@ export default class Board {
     const filteredFilms = filter[filterType](films);
 
     switch (this._currentSortType) {
-      case SORTING_ENTRIES.DATE:
+      case SortingEntries.DATE:
         return this._sortFilmsByReleaseDate(filteredFilms);
-      case SORTING_ENTRIES.RATING:
+      case SortingEntries.RATING:
         return this._sortFilmsByRating(filteredFilms);
     }
     return filteredFilms;
   }
 
   // Профиль пользователя
-  _renderProfileRating(films) {
-    const filteredFilms = filter[FILTER_ENTRIES.HISTORY](films);
-    this._profile = new UserProfileView(filteredFilms.length);
-    render(INDEX_HEADER, this._profile, RenderPosition.BEFOREEND);
+  _renderProfileRating() {
+    const films = this._cardModel.getFilms();
+    const filteredFilms = filter[FilterType.HISTORY](films);
+    this._userProfile = new UserProfileView(filteredFilms.length);
+    render(INDEX_HEADER, this._userProfile, RenderPosition.BEFOREEND);
   }
 
   // Панель сортировки
@@ -284,17 +305,11 @@ export default class Board {
     this._renderFilms(sortedFilms, this._mostCommentedCardsContainerComponent);
   }
 
-  // Рендеринг статистики в футере
-  _renderFooterStat() {
-    const films = this._cardModel.getFilms();
-    this._footerStatComponent = new StatisticsSectionView(films.length);
-    render(STAT_SECTION, this._footerStatComponent, RenderPosition.BEFOREEND);
-  }
-
   // Очистка доски
   _clearFilmSection({
     resetRenderedFilmCount = false,
-    resetSortType = false
+    resetSortType = false,
+    resetUserProfile = false
   } = {}) {
     const filmCount = this._getFilms().length;
 
@@ -303,7 +318,11 @@ export default class Board {
       .forEach((presenter) => presenter.destroy());
     this._cardPresenter = {};
 
-    remove(this._profile);
+    if (resetUserProfile) {
+      remove(this._userProfile);
+      this._userProfile = null;
+    }
+
     remove(this._sortComponent);
     remove(this._mainCardListSectionComponent);
     remove(this._mainCardListComponent);
@@ -311,7 +330,6 @@ export default class Board {
     remove(this._noFilmComponent);
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);
-    remove(this._footerStatComponent);
 
     if (resetRenderedFilmCount) {
       this._renderedCardCount = CARDS_COUNT_PER_STEP;
@@ -320,7 +338,16 @@ export default class Board {
     }
 
     if (resetSortType) {
-      this._currentSortType = SORTING_ENTRIES.DEFAULT;
+      this._currentSortType = SortingEntries.DEFAULT;
     }
+  }
+
+  destroy() {
+    this._clearFilmSection({resetRenderedFilmCount: true, resetSortType: true});
+
+    remove(this._mainCardListSectionComponent);
+
+    this._cardModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 }

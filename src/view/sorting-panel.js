@@ -1,29 +1,29 @@
 import AbstractView from "./abstract";
-import {SORTING_ENTRIES} from "../const";
+import {SortingEntries} from "../const";
 
 const createMainSortTemplate = (currentSortType) => {
   return (
     `<ul class="sort">
       <li>
         <a href="#"
-           class="sort__button ${currentSortType === SORTING_ENTRIES.DEFAULT ? `sort__button--active` : ``}"
-           data-sort-type="${SORTING_ENTRIES.DEFAULT}">
+           class="sort__button ${currentSortType === SortingEntries.DEFAULT ? `sort__button--active` : ``}"
+           data-sort-type="${SortingEntries.DEFAULT}">
            Sort by default
         </a>
       </li>
 
       <li>
         <a href="#"
-           class="sort__button ${currentSortType === SORTING_ENTRIES.DATE ? `sort__button--active` : ``}"
-           data-sort-type="${SORTING_ENTRIES.DATE}">
+           class="sort__button ${currentSortType === SortingEntries.DATE ? `sort__button--active` : ``}"
+           data-sort-type="${SortingEntries.DATE}">
            Sort by date
         </a>
       </li>
 
       <li>
         <a href="#"
-           class="sort__button ${currentSortType === SORTING_ENTRIES.RATING ? `sort__button--active` : ``}"
-           data-sort-type="${SORTING_ENTRIES.RATING}">
+           class="sort__button ${currentSortType === SortingEntries.RATING ? `sort__button--active` : ``}"
+           data-sort-type="${SortingEntries.RATING}">
            Sort by rating
         </a>
       </li>

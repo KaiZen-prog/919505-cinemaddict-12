@@ -1,5 +1,5 @@
 import Abstract from './abstract';
-import {PROFILE_RATING} from "../const";
+import {ProfileRating} from "../const";
 
 const createUserProfileTemplate = (filmsCount) => {
   const setProfileRating = () => {
@@ -7,13 +7,13 @@ const createUserProfileTemplate = (filmsCount) => {
 
     switch (true) {
       case (filmsCount >= 1 && filmsCount <= 10):
-        profileNickName = PROFILE_RATING.NOVICE;
+        profileNickName = ProfileRating.NOVICE;
         break;
       case (filmsCount >= 11 && filmsCount <= 20):
-        profileNickName = PROFILE_RATING.FAN;
+        profileNickName = ProfileRating.FAN;
         break;
       case (filmsCount >= 21):
-        profileNickName = PROFILE_RATING.MOVIE_BUFF;
+        profileNickName = ProfileRating.MOVIE_BUFF;
         break;
       default:
         profileNickName = ``;

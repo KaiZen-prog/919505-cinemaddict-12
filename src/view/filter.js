@@ -1,4 +1,4 @@
-import {FILTER_ENTRIES} from '../const.js';
+import {FilterType} from '../const.js';
 import Abstract from "./abstract";
 
 const toggleClassName = (string, currentFilter) =>
@@ -7,7 +7,7 @@ const toggleClassName = (string, currentFilter) =>
     : ``;
 
 const toggleFilmsQuantity = (count, filter) =>
-  filter === FILTER_ENTRIES.ALL
+  filter === FilterType.ALL
     ? ``
     : `<span class="main-navigation__item-count">${count}</span>`;
 
@@ -30,12 +30,9 @@ const generateFilterElements = (filters, currentFilter) => {
 
 const createFilterTemplate = (filters, currentFilter) => {
   return (
-    `<nav class="main-navigation">
-        <div class="main-navigation__items">
-            ${generateFilterElements(filters, currentFilter)}
-        </div>
-        <a href="#stats" class="main-navigation__additional">Stats</a>
-    </nav>`
+    `<div class="main-navigation__items">
+        ${generateFilterElements(filters, currentFilter)}
+    </div>`
   );
 };
 

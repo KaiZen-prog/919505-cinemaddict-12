@@ -1,18 +1,18 @@
 import Abstract from "./abstract";
 
-const createStatistics = (filmsQuantity) => {
-  return (
-    `<p>${filmsQuantity} movies inside</p>`
-  );
+const createStatisticsTemplate = () => {
+  return (`<h2 class="films-list__title">
+    Здесь будет статистика
+  </h2>`);
 };
 
-export default class StatisticsSection extends Abstract {
-  constructor(filmsQuantity) {
+export default class Statistics extends Abstract {
+  constructor() {
     super();
-    this._filmsQuantity = filmsQuantity;
+
   }
 
   getTemplate() {
-    return createStatistics(this._filmsQuantity);
+    return createStatisticsTemplate();
   }
 }

@@ -1,7 +1,7 @@
 import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
-import {USER_ACTION, UPDATE_TYPE, CARD_MODE} from "../const";
+import {UserAction, UpdateType, CardMode} from "../const";
 
 const INDEX_BODY = document.querySelector(`body`);
 
@@ -13,7 +13,7 @@ export default class Card {
 
     this._cardComponent = null;
     this._popupComponent = null;
-    this._mode = CARD_MODE.DEFAULT;
+    this._mode = CardMode.DEFAULT;
 
     this._handlePopupOpenClick = this._handlePopupOpenClick.bind(this);
     this._handlePopupCloseClick = this._handlePopupCloseClick.bind(this);
@@ -43,11 +43,11 @@ export default class Card {
       return;
     }
 
-    if (this._mode === CARD_MODE.DEFAULT) {
+    if (this._mode === CardMode.DEFAULT) {
       replace(this._cardComponent, prevFilmComponent);
     }
 
-    if (this._mode === CARD_MODE.POPUP) {
+    if (this._mode === CardMode.POPUP) {
       replace(this._popupComponent, prevFilmPopupComponent);
     }
 
@@ -61,18 +61,18 @@ export default class Card {
     this._popupComponent.setClosePopupHandler(this._handlePopupCloseClick);
     this._popupComponent.setClosePopupKeydownHandler(this._handlePopupCloseKeyDown);
     this._changeMode();
-    this._mode = CARD_MODE.POPUP;
+    this._mode = CardMode.POPUP;
   }
 
   // Обработчики закрытия попапа
   _removePopupComponent() {
     remove(this._popupComponent);
-    this._mode = CARD_MODE.DEFAULT;
+    this._mode = CardMode.DEFAULT;
   }
 
   _handlePopupCloseClick(film) {
     this._removePopupComponent();
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film, {
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, film, {
       currentComment: {
         emoji: null
       }
@@ -81,7 +81,7 @@ export default class Card {
 
   _handlePopupCloseKeyDown(evt, film) {
     this._removePopupComponent();
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, film, {
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, film, {
       currentComment: {
         emoji: null
       }
@@ -90,19 +90,19 @@ export default class Card {
 
   // контролы
   _handleAddToWatchlistClick() {
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, this._film, {
       inWatchlist: !this._film.inWatchlist
     }));
   }
 
   _handleAddToHistoryClick() {
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, this._film, {
       isWatched: !this._film.isWatched
     }));
   }
 
   _handleAddToFavoritesClick() {
-    this._changeData(USER_ACTION.UPDATE_FILM, UPDATE_TYPE.MINOR, Object.assign({}, this._film, {
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, this._film, {
       isFavorite: !this._film.isFavorite
     }));
   }
@@ -114,7 +114,7 @@ export default class Card {
   }
 
   resetView() {
-    if (this._mode !== CARD_MODE.DEFAULT) {
+    if (this._mode !== CardMode.DEFAULT) {
       this._removePopupComponent();
     }
   }
