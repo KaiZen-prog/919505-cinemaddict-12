@@ -50,11 +50,12 @@ const handleStatButtonClick = (menuItem) => {
       boardPresenter.init();
       remove(statisticsComponent);
       break;
+
     case MenuItem.STATISTICS:
       filterModel.setFilter(UpdateType.PATCH, FilterType.ALL);
       resetMenuButton(MenuItem.FILMS);
       boardPresenter.destroy();
-      statisticsComponent = new StatisticsView();
+      statisticsComponent = new StatisticsView(filmsModel.getFilms());
       render(INDEX_MAIN, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
