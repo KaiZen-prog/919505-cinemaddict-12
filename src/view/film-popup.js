@@ -5,6 +5,7 @@ import moment from 'moment';
 
 import {formatFilmReleaseDate} from "../utils/film.js";
 import {isEscapeDown} from "../utils/common";
+import {humanizeDuration} from "../utils/film";
 
 const createFilmPopup = (data) => {
   const {
@@ -158,7 +159,7 @@ const createFilmPopup = (data) => {
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Runtime</td>
-                    <td class="film-details__cell">${duration}</td>
+                    <td class="film-details__cell">${humanizeDuration(duration)}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Country</td>

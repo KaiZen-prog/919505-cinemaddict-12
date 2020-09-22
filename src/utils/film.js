@@ -13,3 +13,18 @@ export const formatFilmReleaseDate = (date) => {
   }
   return moment(date).format(`DD MMMM YYYY`);
 };
+
+export const humanizeDuration = function (duration) {
+  let hours = Math.floor(duration / 60) + `h`;
+  let minutes = duration % 60 + `m`;
+
+  if (Math.floor(duration / 60) === 0) {
+    hours = ``;
+  }
+
+  if (duration % 60 === 0) {
+    minutes = ``;
+  }
+
+  return hours + ` ` + minutes;
+};

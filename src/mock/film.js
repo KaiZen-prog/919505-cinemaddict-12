@@ -70,22 +70,6 @@ const COUNTRIES = [
 
 const AGE_LIMITS = [6, 12, 16, 18, 21];
 
-const getRandomDuration = function () {
-  const duration = getRandomInteger(10, 180);
-  let hours = Math.floor(duration / 60) + `h`;
-  let minutes = duration % 60 + `m`;
-
-  if (Math.floor(duration / 60) === 0) {
-    hours = ``;
-  }
-
-  if (duration % 60 === 0) {
-    minutes = ``;
-  }
-
-  return hours + ` ` + minutes;
-};
-
 const setWriters = function () {
   const writers = getRandomSet(CREATORS, getRandomInteger(1, 2));
 
@@ -133,7 +117,7 @@ const generateFilm = () => ({
   rating: getRandomInteger(10, 100) / 10,
   releaseDate: getRandomDate(new Date(1930, 1, 1), new Date(2019, 12, 31)),
   country: getRandomArrayElement(COUNTRIES),
-  duration: getRandomDuration(),
+  duration: getRandomInteger(10, 180),
   genres: setGenres(),
   ageLimit: getRandomArrayElement(AGE_LIMITS),
   description: description.split(`.`, getRandomInteger(1, 5)).toString(),

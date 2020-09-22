@@ -1,16 +1,65 @@
 import SmartView from './abstract';
 // import Chart from 'chart.js';
 // import ChartDataLabels from 'chartjs-plugin-datalabels';
-// import moment from 'moment';
 import {FilterType} from "../const";
 import {filter} from "../utils/filter.js";
+import {humanizeDuration} from "../utils/film.js";
 
 const createStatisticsTemplate = (films) => {
+  const totalWatchedFilms = filter[FilterType.HISTORY](films);
 
-  const getTotalWatchedFilms = (allFilms) => {
-    const totalWatchedFilms = filter[FilterType.HISTORY](allFilms);
-    return totalWatchedFilms.length;
+  // Сбор данных о том, какие жанры были просмотрены и сколько раз
+  const getWatchedGenres = () => {
+    const watchedGenres = {};
+    totalWatchedFilms.forEach((film) => {
+      film.genres.forEach((genre) => {
+        if (!watchedGenres[genre]) {
+          watchedGenres[genre] = Object.assign({}, {
+            timesWatched: 1
+          });
+        } else {
+          watchedGenres[genre].timesWatched++;
+        }
+      });
+    });
+    return watchedGenres;
   };
+
+  const totalWatchedGenres = getWatchedGenres(totalWatchedFilms);
+
+  // Получение любимого жанра
+  const getFavoriteGenre = () => {
+    let max = 0;
+    let favoriteGenre = ``;
+
+    for (let genre in totalWatchedGenres) {
+      if (totalWatchedGenres[genre].timesWatched > max) {
+        max = genre.timesWatched;
+        favoriteGenre = genre;
+      }
+    }
+    return favoriteGenre;
+  };
+
+  const favoriteGenre = getFavoriteGenre();
+
+
+  // Суммарная длительность всех просмотренных фильмов
+  const getTotalWatchedFilmsDuration = () => {
+    let totalDuration = 0;
+
+    for (let i = 0; i < totalWatchedFilms.length; i++) {
+      totalDuration += totalWatchedFilms[i].duration;
+    }
+    return totalDuration;
+  };
+
+  const watchedFilmsQuantity = totalWatchedFilms.length;
+
+  let watchedFilmsStatTitle = `movies`;
+  if (watchedFilmsQuantity === 1) {
+    watchedFilmsStatTitle = `movie`;
+  }
 
   return (
     `<section class="statistic">
@@ -42,15 +91,15 @@ const createStatisticsTemplate = (films) => {
       <ul class="statistic__text-list">
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">You watched</h4>
-          <p class="statistic__item-text">${getTotalWatchedFilms(films)} <span class="statistic__item-description">movies</span></p>
+          <p class="statistic__item-text">${watchedFilmsQuantity} <span class="statistic__item-description">${watchedFilmsStatTitle}</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
-          <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+          <p class="statistic__item-text" id="totalRuntime">${humanizeDuration(getTotalWatchedFilmsDuration(totalWatchedFilms))}</p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
-          <p class="statistic__item-text">Sci-Fi</p>
+          <p class="statistic__item-text">${favoriteGenre}</p>
         </li>
       </ul>
 
@@ -65,6 +114,7 @@ export default class Statistics extends SmartView {
   constructor(films) {
     super();
     this._films = films;
+    this._genres = null;
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
 
@@ -81,7 +131,7 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._films);
+    return createStatisticsTemplate(this._films, this._genres);
   }
 
   restoreHandlers() {
