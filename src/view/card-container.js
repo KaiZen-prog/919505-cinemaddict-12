@@ -6,7 +6,7 @@ const createCardsContainer = () => {
   );
 };
 
-export default class CardsContainer extends Abstract {
+export default class CardContainer extends Abstract {
   getTemplate() {
     return createCardsContainer();
   }

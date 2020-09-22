@@ -1,9 +1,6 @@
-import {MAX_DESCRIPTION_LENGTH} from "../const.js";
-import SmartView from "./smart.js";
-
-import {
-  formatFilmReleaseYear
-} from "../utils/film.js";
+import Abstract from "./abstract.js";
+import {MAX_DESCRIPTION_LENGTH, ClickableHTMLElements} from "../const.js";
+import {formatFilmReleaseYear} from "../utils/film.js";
 
 const createCard = (film) => {
   const {
@@ -21,6 +18,7 @@ const createCard = (film) => {
     id,
   } = film;
 
+  // Редактируем заголовок блока с комментариями в зависимости от их числа
   let commentsLinkTitle;
   if (comments.length === 1) {
     commentsLinkTitle = comments.length + `comment`;
@@ -28,19 +26,29 @@ const createCard = (film) => {
     commentsLinkTitle = comments.length + `comments`;
   }
 
+  // Выставляем максимально допустимую длину описания фильма
   let filmDescription = description;
   if (description.length > MAX_DESCRIPTION_LENGTH) {
     filmDescription = description.substring(0, MAX_DESCRIPTION_LENGTH - 1) + `...`;
   }
 
+  // Выставляем активные/неактивные контролы
+  const isInWatchList = inWatchlist
+    ? `film-card__controls-item--active`
+    : ``;
+
+  const isInHistory = isWatched
+    ? `film-card__controls-item--active`
+    : ``;
+
+  const isInFavorites = isFavorite
+    ? `film-card__controls-item--active`
+    : ``;
+
   return (
     `<article data-id="${id}" class="film-card">
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
-        <p class="film-card__info"></p>
-        <p class="film-card__info">inWatchlist: ${inWatchlist}</p>
-        <p class="film-card__info">isWatched: ${isWatched}</p>
-        <p class="film-card__info">isFavorite: ${isFavorite}</p>
         <p class="film-card__info">
             <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
             <span class="film-card__duration">${duration}</span>
@@ -50,23 +58,22 @@ const createCard = (film) => {
         <p class="film-card__description">${filmDescription}</p>
         <a class="film-card__comments">${commentsLinkTitle}</a>
         <form class="film-card__controls">
-            <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-            <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-            <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+            <button class="film-card__controls-item button ${isInWatchList} film-card__controls-item--add-to-watchlist">Add to watchlist</button>
+            <button class="film-card__controls-item button ${isInHistory} film-card__controls-item--mark-as-watched">Mark as watched</button>
+            <button class="film-card__controls-item button ${isInFavorites} film-card__controls-item--favorite">Mark as favorite</button>
         </form>
     </article>`
   );
 };
 
-export default class Card extends SmartView {
-  constructor(film, changeData) {
+export default class Card extends Abstract {
+  constructor(film) {
     super();
     this._film = film;
-    this._data = Card.parseFilmToData(this._film);
-    this._changeData = changeData;
-
     this._clickHandler = this._clickHandler.bind(this);
-    this._setInnerHandlers();
+    this._addToWatchListHandler = this._addToWatchListHandler.bind(this);
+    this._addToHistoryHandler = this._addToHistoryHandler.bind(this);
+    this._addToFavoritesHandler = this._addToFavoritesHandler.bind(this);
   }
 
   getTemplate() {
@@ -75,7 +82,9 @@ export default class Card extends SmartView {
 
   _clickHandler(evt) {
     evt.preventDefault();
-    this._callback.click(evt);
+    if (ClickableHTMLElements.hasOwnProperty(evt.target.tagName)) {
+      this._callback.click(evt);
+    }
   }
 
   setClickHandler(callback) {
@@ -83,48 +92,33 @@ export default class Card extends SmartView {
     this.getElement().addEventListener(`click`, this._clickHandler);
   }
 
-  _setInnerHandlers() {
-    const element = this.getElement();
-    element.querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {inWatchlist: !this._film.inWatchlist}));
-    });
-
-    element.querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {isWatched: !this._film.isWatched}));
-    });
-
-    element.querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this._changeData(Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}));
-    });
+  _addToWatchListHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToWatchListClick();
   }
 
-  restoreHandlers() {
-    this.setClickHandler(this._callback.click);
-    this._setInnerHandlers();
+  setAddToWatchlistClickHandler(callback) {
+    this._callback.addToWatchListClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, this._addToWatchListHandler);
   }
 
-  static parseFilmToData(film) {
-    return Object.assign(
-        {},
-        film,
-        {
-          poster: film.poster,
-          ageLimit: film.ageLimit,
-          title: film.title,
-          rating: film.rating,
-          director: film.director,
-          writers: film.writers,
-          actors: film.actors,
-          releaseDate: film.releaseDate,
-          duration: film.duration,
-          country: film.country,
-          genres: film.genres,
-          description: film.description,
-          comments: film.comments,
-          emojiSrc: film.emojiSrc
-        });
+  _addToHistoryHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToHistoryClick();
+  }
+
+  setAddToHistoryClickHandler(callback) {
+    this._callback.addToHistoryClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, this._addToHistoryHandler);
+  }
+
+  _addToFavoritesHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToFavoritesClick();
+  }
+
+  setAddToFavoritesClickHandler(callback) {
+    this._callback.addToFavoritesClick = callback;
+    this.getElement().querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, this._addToFavoritesHandler);
   }
 }
