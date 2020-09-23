@@ -8,6 +8,10 @@ import {
   generateId
 } from "../utils/common.js";
 
+const CURRENT_DATE = new Date();
+let twoYearsBefore = new Date();
+twoYearsBefore.setFullYear(twoYearsBefore.getFullYear() - 2);
+
 import {CARDS_QUANTITY} from "../const";
 
 const titles = [
@@ -126,6 +130,7 @@ const generateFilm = () => ({
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
   currentComment: generateCurrentComment(),
+  watchingDate: getRandomDate(CURRENT_DATE, twoYearsBefore),
   emojiSrc: ``,
   id: ``
 });

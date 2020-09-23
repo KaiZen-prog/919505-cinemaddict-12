@@ -1,39 +1,93 @@
 import SmartView from './abstract';
-// import Chart from 'chart.js';
-// import ChartDataLabels from 'chartjs-plugin-datalabels';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {FilterType} from "../const";
 import {filter} from "../utils/filter.js";
 import {humanizeDuration} from "../utils/film.js";
+import {countWatchedFilmsInDateRange} from "../utils/statistics.js";
 
-const createStatisticsTemplate = (films) => {
-  const totalWatchedFilms = filter[FilterType.HISTORY](films);
+const CURRENT_DATE = new Date();
 
-  // Сбор данных о том, какие жанры были просмотрены и сколько раз
-  const getWatchedGenres = () => {
-    const watchedGenres = {};
-    totalWatchedFilms.forEach((film) => {
-      film.genres.forEach((genre) => {
-        if (!watchedGenres[genre]) {
-          watchedGenres[genre] = Object.assign({}, {
-            timesWatched: 1
-          });
-        } else {
-          watchedGenres[genre].timesWatched++;
+const renderChart = (ctx, watchedGenres) => {
+  const BAR_HEIGHT = 50;
+
+  const watchedGenresLabels = [];
+  for (let genre in watchedGenres) {
+    watchedGenresLabels.push(genre);
+  }
+
+  const watchedGenresCounts = [];
+  for (let genre in watchedGenres) {
+    watchedGenresCounts.push(watchedGenres[genre].timesWatched);
+  }
+  ctx.height = BAR_HEIGHT * 5;
+
+  return new Chart(ctx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: watchedGenresLabels,
+      datasets: [{
+        data: watchedGenresCounts,
+        backgroundColor: `#ffe800`,
+        hoverBackgroundColor: `#ffe800`,
+        anchor: `start`
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20
+          },
+          color: `#ffffff`,
+          anchor: 'start',
+          align: 'start',
+          offset: 40,
         }
-      });
-    });
-    return watchedGenres;
-  };
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#ffffff`,
+            padding: 100,
+            fontSize: 20
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 24
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false
+      }
+    }
+  });
+};
 
-  const totalWatchedGenres = getWatchedGenres(totalWatchedFilms);
-
+const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
   // Получение любимого жанра
   const getFavoriteGenre = () => {
     let max = 0;
     let favoriteGenre = ``;
 
-    for (let genre in totalWatchedGenres) {
-      if (totalWatchedGenres[genre].timesWatched > max) {
+    for (let genre in watchedGenres) {
+      if (watchedGenres[genre].timesWatched > max) {
         max = genre.timesWatched;
         favoriteGenre = genre;
       }
@@ -48,18 +102,38 @@ const createStatisticsTemplate = (films) => {
   const getTotalWatchedFilmsDuration = () => {
     let totalDuration = 0;
 
-    for (let i = 0; i < totalWatchedFilms.length; i++) {
-      totalDuration += totalWatchedFilms[i].duration;
+    for (let i = 0; i < watchedFilms.length; i++) {
+      totalDuration += watchedFilms[i].duration;
     }
     return totalDuration;
   };
 
-  const watchedFilmsQuantity = totalWatchedFilms.length;
+  const watchedFilmsQuantity = watchedFilms.length;
 
   let watchedFilmsStatTitle = `movies`;
   if (watchedFilmsQuantity === 1) {
     watchedFilmsStatTitle = `movie`;
   }
+
+  // Сколько фильмов просмотрено за прошедший год
+  let yearBefore = new Date();
+  yearBefore.setFullYear(yearBefore.getFullYear() - 1);
+  const watchedFilmsLastYear = countWatchedFilmsInDateRange(watchedFilms, yearBefore, CURRENT_DATE)
+
+  // Сколько фильмов просмотрено за прошедший месяц
+  let monthBefore = new Date();
+  monthBefore.setMonth(monthBefore.getMonth() - 1);
+  const watchedFilmsLastMonth = countWatchedFilmsInDateRange(watchedFilms, monthBefore, CURRENT_DATE)
+
+  // Сколько фильмов просмотрено за прошедшую неделю
+  let weekBefore = new Date();
+  weekBefore.setDate(weekBefore.getDate() - 7);
+  const watchedFilmsLastWeek = countWatchedFilmsInDateRange(watchedFilms, weekBefore, CURRENT_DATE)
+
+  // Сколько фильмов просмотрено за прошедшие сутки
+  let dayBefore = new Date();
+  dayBefore.setDate(dayBefore.getDate() - 1);
+  const watchedFilmsToday = countWatchedFilmsInDateRange(watchedFilms, dayBefore, CURRENT_DATE)
 
   return (
     `<section class="statistic">
@@ -95,7 +169,7 @@ const createStatisticsTemplate = (films) => {
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
-          <p class="statistic__item-text" id="totalRuntime">${humanizeDuration(getTotalWatchedFilmsDuration(totalWatchedFilms))}</p>
+          <p class="statistic__item-text">${humanizeDuration(getTotalWatchedFilmsDuration(watchedFilms))}</p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
@@ -113,8 +187,8 @@ const createStatisticsTemplate = (films) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
-    this._films = films;
-    this._genres = null;
+    this._watchedFilms = filter[FilterType.HISTORY](films);
+    this._watchedGenres = this._getWatchedGenres(this._watchedFilms);
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
 
@@ -131,8 +205,25 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._films, this._genres);
+    return createStatisticsTemplate(this._watchedFilms, this._watchedGenres);
   }
+
+  // Сбор данных о том, какие жанры были просмотрены и сколько раз
+  _getWatchedGenres(films) {
+    const watchedGenres = {};
+    films.forEach((film) => {
+      film.genres.forEach((genre) => {
+        if (!watchedGenres[genre]) {
+          watchedGenres[genre] = Object.assign({}, {
+            timesWatched: 1
+          });
+        } else {
+          watchedGenres[genre].timesWatched++;
+        }
+      });
+    });
+    return watchedGenres;
+  };
 
   restoreHandlers() {
     this._setCharts();
@@ -151,5 +242,7 @@ export default class Statistics extends SmartView {
 
   _setCharts() {
     // Нужно отрисовать два графика
+    const ctx = this.getElement().querySelector(`.statistic__chart`);
+    this._chart = renderChart(ctx, this._watchedGenres);
   }
 }
