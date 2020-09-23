@@ -5,20 +5,16 @@ const createUserProfileTemplate = (filmsCount) => {
   const setProfileRating = () => {
     let profileNickName = ``;
 
-    switch (true) {
-      case (filmsCount >= 1 && filmsCount <= 10):
-        profileNickName = ProfileRating.NOVICE;
-        break;
-      case (filmsCount >= 11 && filmsCount <= 20):
+    if (filmsCount <= 10) {
+      profileNickName = ProfileRating.NOVICE;
+    } else {
+      if (filmsCount <= 20) {
         profileNickName = ProfileRating.FAN;
-        break;
-      case (filmsCount >= 21):
+      } else {
         profileNickName = ProfileRating.MOVIE_BUFF;
-        break;
-      default:
-        profileNickName = ``;
-        break;
+      }
     }
+
     return profileNickName;
   };
 

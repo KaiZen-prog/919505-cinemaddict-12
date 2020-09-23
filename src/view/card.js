@@ -1,6 +1,6 @@
 import Abstract from "./abstract.js";
 import {MAX_DESCRIPTION_LENGTH, ClickableHTMLElements} from "../const.js";
-import {formatFilmReleaseYear} from "../utils/film.js";
+import {formatFilmReleaseYear, humanizeDuration} from "../utils/film.js";
 
 const createCard = (film) => {
   const {
@@ -51,7 +51,7 @@ const createCard = (film) => {
         <p class="film-card__rating">${rating}</p>
         <p class="film-card__info">
             <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
-            <span class="film-card__duration">${duration}</span>
+            <span class="film-card__duration">${humanizeDuration(duration)}</span>
             <span class="film-card__genre">${genres}</span>
         </p>
         <img src="./images/posters/${poster}"  alt="" class="film-card__poster">
