@@ -57,6 +57,31 @@ const ProfileRating = {
   MOVIE_BUFF: `movie buff`
 };
 
+const StatisticsFilters = {
+  ALL_TIME: `statistic-all-time`,
+  TODAY: `statistic-today`,
+  WEEK: `statistic-week`,
+  MONTH: `statistic-month`,
+  YEAR: `statistic-year`
+};
+
+const StatisticsValues = {
+  ALL_TIME: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};
+
+const StatisticsLabels = {
+  ALL_TIME: `All time`,
+  TODAY: `Today`,
+  WEEK: `Week`,
+  MONTH: `Month`,
+  YEAR: `Year`
+};
+
+
 export {
   KEY_CODE_ESCAPE,
   CHAR_BAR_HEIGHT,
@@ -71,5 +96,8 @@ export {
   ExtraSections,
   UserAction,
   UpdateType,
-  ProfileRating
+  ProfileRating,
+  StatisticsFilters,
+  StatisticsValues,
+  StatisticsLabels
 };

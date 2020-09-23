@@ -1,25 +1,31 @@
-import SmartView from './abstract';
+import SmartView from './smart';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {FilterType} from "../const";
+import {FilterType, StatisticsFilters, StatisticsValues, StatisticsLabels} from "../const";
 import {filter} from "../utils/filter.js";
 import {humanizeDuration} from "../utils/film.js";
-import {countWatchedFilmsInDateRange} from "../utils/statistics.js";
+import {getWatchedFilmsInDateRange} from "../utils/statistics.js";
 
 const CURRENT_DATE = new Date();
 
+// Рендеринг графика
 const renderChart = (ctx, watchedGenres) => {
   const BAR_HEIGHT = 50;
 
   const watchedGenresLabels = [];
   for (let genre in watchedGenres) {
-    watchedGenresLabels.push(genre);
+    if (watchedGenres.hasOwnProperty(genre)) {
+      watchedGenresLabels.push(genre);
+    }
   }
 
   const watchedGenresCounts = [];
   for (let genre in watchedGenres) {
-    watchedGenresCounts.push(watchedGenres[genre].timesWatched);
+    if (watchedGenres.hasOwnProperty(genre)) {
+      watchedGenresCounts.push(watchedGenres[genre].timesWatched);
+    }
   }
+
   ctx.height = BAR_HEIGHT * 5;
 
   return new Chart(ctx, {
@@ -41,8 +47,8 @@ const renderChart = (ctx, watchedGenres) => {
             size: 20
           },
           color: `#ffffff`,
-          anchor: 'start',
-          align: 'start',
+          anchor: `start`,
+          align: `start`,
           offset: 40,
         }
       },
@@ -80,7 +86,7 @@ const renderChart = (ctx, watchedGenres) => {
   });
 };
 
-const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
+const createStatisticsTemplate = (watchedFilms, watchedGenres, currentFilter, currentWatchedGenresCount) => {
   // Получение любимого жанра
   const getFavoriteGenre = () => {
     let max = 0;
@@ -92,6 +98,7 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
         favoriteGenre = genre;
       }
     }
+
     return favoriteGenre;
   };
 
@@ -115,25 +122,40 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
     watchedFilmsStatTitle = `movie`;
   }
 
-  // Сколько фильмов просмотрено за прошедший год
-  let yearBefore = new Date();
-  yearBefore.setFullYear(yearBefore.getFullYear() - 1);
-  const watchedFilmsLastYear = countWatchedFilmsInDateRange(watchedFilms, yearBefore, CURRENT_DATE)
+  // Генерация фильтров статистики
+  const generateInputs = () => {
+    let inputs = ``;
 
-  // Сколько фильмов просмотрено за прошедший месяц
-  let monthBefore = new Date();
-  monthBefore.setMonth(monthBefore.getMonth() - 1);
-  const watchedFilmsLastMonth = countWatchedFilmsInDateRange(watchedFilms, monthBefore, CURRENT_DATE)
+    for (let statFilter in StatisticsFilters) {
+      if (StatisticsFilters.hasOwnProperty(statFilter)) {
+        const isChecked = () => {
+          let string = ``;
+          if (StatisticsFilters[statFilter] === currentFilter) {
+            string += `checked`;
+          }
+          return string;
+        };
 
-  // Сколько фильмов просмотрено за прошедшую неделю
-  let weekBefore = new Date();
-  weekBefore.setDate(weekBefore.getDate() - 7);
-  const watchedFilmsLastWeek = countWatchedFilmsInDateRange(watchedFilms, weekBefore, CURRENT_DATE)
+        inputs +=
+          `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="${StatisticsFilters[statFilter]}" value="${StatisticsValues[statFilter]}" ${isChecked()}>
+        <label for="${StatisticsFilters[statFilter]}" class="statistic__filters-label">${StatisticsLabels[statFilter]}</label>`;
+      }
+    }
 
-  // Сколько фильмов просмотрено за прошедшие сутки
-  let dayBefore = new Date();
-  dayBefore.setDate(dayBefore.getDate() - 1);
-  const watchedFilmsToday = countWatchedFilmsInDateRange(watchedFilms, dayBefore, CURRENT_DATE)
+    return inputs;
+  };
+
+  const canvasToggler = () => {
+    if (currentWatchedGenresCount > 0) {
+      return (
+        `<div class="statistic__chart-wrap">
+        <canvas class="statistic__chart" width="1000"></canvas>
+        </div>`
+      );
+    } else {
+      return (``);
+    }
+  };
 
   return (
     `<section class="statistic">
@@ -145,21 +167,7 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
 
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
         <p class="statistic__filters-description">Show stats:</p>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
-        <label for="statistic-all-time" class="statistic__filters-label">All time</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
-        <label for="statistic-today" class="statistic__filters-label">Today</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
-        <label for="statistic-week" class="statistic__filters-label">Week</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
-        <label for="statistic-month" class="statistic__filters-label">Month</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
-        <label for="statistic-year" class="statistic__filters-label">Year</label>
+        ${generateInputs()}
       </form>
 
       <ul class="statistic__text-list">
@@ -176,10 +184,7 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
           <p class="statistic__item-text">${favoriteGenre}</p>
         </li>
       </ul>
-
-      <div class="statistic__chart-wrap">
-        <canvas class="statistic__chart" width="1000"></canvas>
-      </div>
+      ${canvasToggler()}
     </section>`
   );
 };
@@ -187,12 +192,34 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
-    this._watchedFilms = filter[FilterType.HISTORY](films);
-    this._watchedGenres = this._getWatchedGenres(this._watchedFilms);
+    this._currentWatchedGenresCount = 0;
+    this._totalWatchedFilms = filter[FilterType.HISTORY](films);
+    this._totalWatchedGenres = this._getWatchedGenres(this._totalWatchedFilms);
+
+    // Фильмы за прошедший год
+    let yearBefore = new Date().setFullYear(new Date().getFullYear() - 1);
+    this._filmsWatchedLastYear = getWatchedFilmsInDateRange(this._totalWatchedFilms, yearBefore, CURRENT_DATE);
+
+    // Фильмы за прошедший месяц
+    let monthBefore = new Date().setMonth(new Date().getMonth() - 1);
+    this._filmsWatchedLastMonth = getWatchedFilmsInDateRange(this._totalWatchedFilms, monthBefore, CURRENT_DATE);
+
+    // Фильмы за прошедшую неделю
+    let weekBefore = new Date().setDate(new Date().getDate() - 7);
+    this._filmsWatchedLastWeek = getWatchedFilmsInDateRange(this._totalWatchedFilms, weekBefore, CURRENT_DATE);
+
+    // Фильмы за прошедшие сутки
+    let dayBefore = new Date().setDate(new Date().getDate() - 1);
+    this._filmsWatchedToday = getWatchedFilmsInDateRange(this._totalWatchedFilms, dayBefore, CURRENT_DATE);
+
+    this._currentFilter = StatisticsFilters.ALL_TIME;
+    this._currentWatchedFilms = this._totalWatchedFilms;
+    this._currentWatchedGenres = this._totalWatchedGenres;
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
+    this._changeStatTimeClickHandler();
 
-    this._setCharts();
+    this._setChart();
   }
 
   removeElement() {
@@ -205,11 +232,22 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._watchedFilms, this._watchedGenres);
+    return createStatisticsTemplate(
+        this._currentWatchedFilms,
+        this._currentWatchedGenres,
+        this._currentFilter,
+        this._currentWatchedGenresCount
+    );
+  }
+
+  restoreHandlers() {
+    this._setChart();
+    this._changeStatTimeClickHandler();
   }
 
   // Сбор данных о том, какие жанры были просмотрены и сколько раз
   _getWatchedGenres(films) {
+    this._currentWatchedGenresCount = 0;
     const watchedGenres = {};
     films.forEach((film) => {
       film.genres.forEach((genre) => {
@@ -217,32 +255,64 @@ export default class Statistics extends SmartView {
           watchedGenres[genre] = Object.assign({}, {
             timesWatched: 1
           });
+          this._currentWatchedGenresCount++;
         } else {
           watchedGenres[genre].timesWatched++;
         }
       });
     });
     return watchedGenres;
-  };
-
-  restoreHandlers() {
-    this._setCharts();
   }
 
-  _dateChangeHandler([dateFrom, dateTo]) {
-    if (!dateFrom || !dateTo) {
+  _setChart() {
+    if (this._currentWatchedGenresCount === 0) {
       return;
     }
 
-    this.updateData({
-      dateFrom,
-      dateTo
-    });
+    const ctx = this.getElement().querySelector(`.statistic__chart`);
+    renderChart(ctx, this._currentWatchedGenres);
   }
 
-  _setCharts() {
-    // Нужно отрисовать два графика
-    const ctx = this.getElement().querySelector(`.statistic__chart`);
-    this._chart = renderChart(ctx, this._watchedGenres);
+
+  _changeStatTimeClickHandler() {
+    this.getElement().querySelector(`.statistic__filters`).addEventListener(`change`, this._dateChangeHandler);
+  }
+
+
+  _dateChangeHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.id === this._currentFilter) {
+      return;
+    }
+
+    switch (evt.target.id) {
+      case StatisticsFilters.TODAY:
+        this._currentWatchedFilms = this._filmsWatchedToday;
+        this._currentFilter = StatisticsFilters.TODAY;
+        break;
+
+      case StatisticsFilters.WEEK:
+        this._currentWatchedFilms = this._filmsWatchedLastWeek;
+        this._currentFilter = StatisticsFilters.WEEK;
+        break;
+
+      case StatisticsFilters.MONTH:
+        this._currentWatchedFilms = this._filmsWatchedLastMonth;
+        this._currentFilter = StatisticsFilters.MONTH;
+        break;
+
+      case StatisticsFilters.YEAR:
+        this._currentWatchedFilms = this._filmsWatchedLastYear;
+        this._currentFilter = StatisticsFilters.YEAR;
+        break;
+
+      default:
+        this._currentWatchedFilms = this._totalWatchedFilms;
+        this._currentFilter = StatisticsFilters.ALL_TIME;
+        break;
+    }
+
+    this._currentWatchedGenres = this._getWatchedGenres(this._currentWatchedFilms);
+    this.updateElement();
   }
 }

@@ -2,16 +2,18 @@ import moment from "moment";
 
 // С помощью moment.js проверям, сколько фильмов
 // попадают в диапазон дат
-export const countWatchedFilmsInDateRange = (films, dateFrom, dateTo) => {
-  return films.reduce((counter, film) => {
+export const getWatchedFilmsInDateRange = (films, dateFrom, dateTo) => {
+  const watchedFilms = [];
+
+  films.forEach((film) => {
     if (
       moment(film.watchingDate).isSame(dateFrom) ||
       moment(film.watchingDate).isBetween(dateFrom, dateTo) ||
       moment(film.watchingDate).isSame(dateTo)
     ) {
-      return counter + 1;
+      watchedFilms.push(film);
     }
+  });
 
-    return counter;
-  }, 0);
+  return watchedFilms;
 };
