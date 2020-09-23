@@ -7,12 +7,11 @@ import {
   getRandomDate,
   generateId
 } from "../utils/common.js";
+import moment from "moment";
+import {CARDS_QUANTITY} from "../const";
 
 const CURRENT_DATE = new Date();
-let twoYearsBefore = new Date();
-twoYearsBefore.setFullYear(twoYearsBefore.getFullYear() - 2);
-
-import {CARDS_QUANTITY} from "../const";
+const TWO_YEARS_BEFORE = moment(CURRENT_DATE).subtract(2, `years`).toDate();
 
 const titles = [
   `Made for each other`,
@@ -130,7 +129,7 @@ const generateFilm = () => ({
   isFavorite: getRandomBool(),
   comments: getComments(getRandomInteger(0, 5)),
   currentComment: generateCurrentComment(),
-  watchingDate: getRandomDate(CURRENT_DATE, twoYearsBefore),
+  watchingDate: getRandomDate(CURRENT_DATE, TWO_YEARS_BEFORE),
   emojiSrc: ``,
   id: ``
 });
