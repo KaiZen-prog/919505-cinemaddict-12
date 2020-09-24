@@ -69,7 +69,7 @@ const COUNTRIES = [
   `France`,
 ];
 
-const AGE_LIMITS = [6, 12, 16, 18, 21]
+const AGE_LIMITS = [6, 12, 16, 18, 21];
 
 const CURRENT_DATE = new Date();
 const TWO_YEARS_BEFORE = moment(CURRENT_DATE).subtract(2, `years`).toDate();
