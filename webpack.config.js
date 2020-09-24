@@ -1,5 +1,6 @@
-const path = require('path');
+const path = require(`path`);
 const MomentLocalesPlugin = require(`moment-locales-webpack-plugin`);
+const momentDurationFormatSetup = require(`moment-duration-format`);
 
 module.exports = {
   mode: 'development',

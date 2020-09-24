@@ -1,4 +1,4 @@
-import {MenuItem, UpdateType, FilterType} from "./const.js";
+import {MenuItem, UpdateType, FilterType, BackendValues} from "./const.js";
 import {render, RenderPosition, remove} from "./utils/render.js";
 
 import Api from "./api.js";
@@ -16,10 +16,7 @@ import FilterPresenter from "./presenter/filter.js";
 const INDEX_MAIN = document.querySelector(`.main`);
 const FILMS_QUANTITY_SECTION = document.querySelector(`.footer__statistics`);
 
-const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2j`;
-const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict`;
-
-const api = new Api(END_POINT, AUTHORIZATION);
+const api = new Api(BackendValues.END_POINT, BackendValues.AUTHORIZATION);
 
 const filmsModel = new FilmsModel();
 const filterModel = new FilterModel();

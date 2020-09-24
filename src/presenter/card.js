@@ -2,12 +2,9 @@ import Api from "../api.js";
 import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType, CardMode} from "../const";
+import {UserAction, UpdateType, CardMode, BackendValues} from "../const";
 
-const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2j`;
-const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict/`;
-
-const api = new Api(END_POINT, AUTHORIZATION);
+const api = new Api(BackendValues.END_POINT, BackendValues.AUTHORIZATION);
 const INDEX_BODY = document.querySelector(`body`);
 
 export default class Card {

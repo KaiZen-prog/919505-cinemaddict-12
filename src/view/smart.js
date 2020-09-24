@@ -1,9 +1,19 @@
 import Abstract from "./abstract";
+import Api from "../api.js";
+import {BackendValues} from "../const";
+
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
+const api = new Api(BackendValues.END_POINT, BackendValues.AUTHORIZATION);
 
 export default class Smart extends Abstract {
   constructor() {
     super();
     this._data = {};
+  }
+
+  restoreHandlers() {
+    throw new Error(`Abstract method not implemented: resetHandlers`);
   }
 
   updateData(update, dataUpdating) {
@@ -37,17 +47,34 @@ export default class Smart extends Abstract {
     if (!update) {
       return;
     }
-    this._data.comments.push(update);
-    this.updateElement();
+
+    api.updateComments(this._data.id, update)
+      .then((comments) => {
+        delete this._data.comments;
+        this._data.comments = comments;
+      })
+      .then(() => this.updateElement())
+      .catch(() => {
+        this.shake(this.updateElement.bind(this));
+      });
   }
 
   deleteComment(number) {
+    const id = number.split(`-`)[0];
     const index = number.split(`-`)[1];
-    this._data.comments.splice(index, 1);
-    this.updateElement();
+    api.deleteComment(id)
+      .then(() => this._data.comments.splice(index, 1))
+      .then(() => this.updateElement())
+      .catch(() => {
+        this.shake(this.updateElement.bind(this));
+      });
   }
 
-  restoreHandlers() {
-    throw new Error(`Abstract method not implemented: resetHandlers`);
+  shake(callback) {
+    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      this.getElement().style.animation = ``;
+      callback();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }

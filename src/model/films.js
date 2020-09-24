@@ -71,8 +71,8 @@ export default class Films extends Observer {
   static modifyComments(comments) {
     return comments.map((element) => {
       const newElement = Object.assign({}, element, {
-        emoji: element.emotion,
-        day: moment(new Date(element.date)).format(`YYYY/MM/DD HH:mm`)
+        day: moment(new Date(element.date)).format(`YYYY/MM/DD HH:mm`),
+        emoji: element.emotion
       });
 
       delete newElement.emotion;
@@ -154,8 +154,8 @@ export default class Films extends Observer {
   static adaptCommentToServer(comment) {
     const adaptedComment = Object.assign({}, {
       "comment": comment.comment,
-      "emotion": comment.emoji,
-      "date": comment.day
+      "date": comment.date,
+      "emotion": comment.emoji
     });
 
     delete adaptedComment.emoji;

@@ -1,6 +1,5 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import moment from "moment";
 import {FilterType, StatisticsFilters, StatisticsValues, StatisticsLabels} from "../const";
 import {filter} from "../utils/filter.js";
 import {getWatchedFilmsInDateRange, setProfileRank} from "../utils/statistics.js";
@@ -156,11 +155,11 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
     }
   };
 
-  const totalDuration = moment.utc(
-      moment.duration(
-          getTotalWatchedFilmsDuration(watchedFilms),
-          `minutes`
-      ).asMilliseconds()).format(`H[h] m[m]`);
+  const formattedDuration = (minutes) => {
+    let hrs = Math.trunc(minutes / 60);
+    let mins = minutes % 60;
+    return hrs + `h ` + mins + `m`;
+  };
 
   return (
     `<section class="statistic">
@@ -182,7 +181,7 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
-          <p class="statistic__item-text">${totalDuration}</p>
+          <p class="statistic__item-text">${(formattedDuration(getTotalWatchedFilmsDuration()))}</p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>

@@ -317,6 +317,10 @@ export default class Board {
   _renderFilmsExtra(films) {
     const sortedFilms = this._sortFilmsByRating(films).slice(0, SPECIAL_CARDS_COUNT);
 
+    if (sortedFilms[0].rating === 0) {
+      return;
+    }
+
     render(this._mainCardListSectionComponent, this._topCardsListComponent, RenderPosition.BEFOREEND);
     render(this._topCardsListComponent, this._topCardsContainerComponent, RenderPosition.BEFOREEND);
 
@@ -325,6 +329,10 @@ export default class Board {
 
   _renderFilmsMost(films) {
     const sortedFilms = this._sortFilmsByComments(films).slice(0, SPECIAL_CARDS_COUNT);
+
+    if (sortedFilms[0].comments.length === 0) {
+      return;
+    }
 
     render(this._mainCardListSectionComponent, this._mostCommentedCardsListComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedCardsListComponent, this._mostCommentedCardsContainerComponent, RenderPosition.BEFOREEND);
