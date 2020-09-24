@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import {
   CARDS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,
@@ -39,8 +41,9 @@ export default class Board {
     this._mainContainerComponent = container;
     this._currentSortType = SortingEntries.DEFAULT;
     this._renderedCardCount = CARDS_COUNT_PER_STEP;
+    this._isLoading = true;
 
-    this._userProfile = null;
+    this._userProfileComponent = null;
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
 
@@ -78,8 +81,13 @@ export default class Board {
 
   // Рендеринг доски
   _renderBoard() {
-    if (this._userProfile === null) {
+    if (this._userProfileComponent === null) {
       this._renderProfileRating();
+    }
+
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
     }
 
     this._renderSort();
@@ -116,6 +124,14 @@ export default class Board {
 
   _handleModelEvent(updateType) {
     switch (updateType) {
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        remove(this._userProfileComponent);
+        this._userProfileComponent = null;
+        this._renderBoard();
+        break;
+
       case UpdateType.PATCH:
         this._clearFilmSection({
           resetRenderedFilmCount: true,
@@ -168,8 +184,8 @@ export default class Board {
   _renderProfileRating() {
     const films = this._cardModel.getFilms();
     const filteredFilms = filter[FilterType.HISTORY](films);
-    this._userProfile = new UserProfileView(filteredFilms.length);
-    render(INDEX_HEADER, this._userProfile, RenderPosition.BEFOREEND);
+    this._userProfileComponent = new UserProfileView(filteredFilms.length);
+    render(INDEX_HEADER, this._userProfileComponent, RenderPosition.BEFOREEND);
   }
 
   // Панель сортировки
@@ -221,12 +237,19 @@ export default class Board {
   // Сортируем фильмы по дате выхода
   _sortFilmsByReleaseDate(films) {
     return films.slice().sort((left, right) => {
-      let rankDiff = right.releaseDate - left.releaseDate;
+      let dateRight = moment(right.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
+      let dateLeft = moment(left.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
+      let rankDiff = dateRight - dateLeft;
+
       if (rankDiff === 0) {
         rankDiff = films.indexOf(left) - films.indexOf(right);
       }
       return rankDiff;
     });
+  }
+
+  _renderLoading() {
+    render(this._mainCardListSectionComponent, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
   // Рендеринг карточек
@@ -319,14 +342,15 @@ export default class Board {
     this._cardPresenter = {};
 
     if (resetUserProfile) {
-      remove(this._userProfile);
-      this._userProfile = null;
+      remove(this._userProfileComponent);
+      this._userProfileComponent = null;
     }
 
     remove(this._sortComponent);
     remove(this._mainCardListSectionComponent);
     remove(this._mainCardListComponent);
     remove(this._mainCardsContainerComponent);
+    remove(this._loadingComponent);
     remove(this._noFilmComponent);
     remove(this._showMoreButtonComponent);
     remove(this._loadingComponent);

@@ -1,7 +1,5 @@
 const KEY_CODE_ESCAPE = 27;
 
-const CHAR_BAR_HEIGHT = 50;
-
 const CARDS_QUANTITY = 25;
 const CARDS_COUNT_PER_STEP = 5;
 const SPECIAL_CARDS_COUNT = 2;
@@ -41,9 +39,10 @@ const UserAction = {
 };
 
 const UpdateType = {
+  INIT: `INIT`,
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`,
+  MAJOR: `MAJOR`
 };
 
 export const MenuItem = {
@@ -84,7 +83,6 @@ const StatisticsLabels = {
 
 export {
   KEY_CODE_ESCAPE,
-  CHAR_BAR_HEIGHT,
   CARDS_QUANTITY,
   CARDS_COUNT_PER_STEP,
   SPECIAL_CARDS_COUNT,

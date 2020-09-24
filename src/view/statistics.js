@@ -1,10 +1,11 @@
-import SmartView from './smart';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import moment from "moment";
 import {FilterType, StatisticsFilters, StatisticsValues, StatisticsLabels} from "../const";
 import {filter} from "../utils/filter.js";
-import {humanizeDuration} from "../utils/film.js";
-import {getWatchedFilmsInDateRange} from "../utils/statistics.js";
+import {getWatchedFilmsInDateRange, setProfileRank} from "../utils/statistics.js";
+
+import SmartView from './smart';
 
 const CURRENT_DATE = new Date();
 
@@ -86,7 +87,7 @@ const renderChart = (ctx, watchedGenres) => {
   });
 };
 
-const createStatisticsTemplate = (watchedFilms, watchedGenres, currentFilter, currentWatchedGenresCount) => {
+const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres, currentFilter, currentWatchedGenresCount) => {
   // Получение любимого жанра
   const getFavoriteGenre = () => {
     let max = 0;
@@ -110,7 +111,7 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres, currentFilter, cu
     let totalDuration = 0;
 
     for (let i = 0; i < watchedFilms.length; i++) {
-      totalDuration += watchedFilms[i].duration;
+      totalDuration += watchedFilms[i].durationNotFormatted;
     }
     return totalDuration;
   };
@@ -157,12 +158,18 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres, currentFilter, cu
     }
   };
 
+  const totalDuration = moment.utc(
+      moment.duration(
+          getTotalWatchedFilmsDuration(watchedFilms),
+          `minutes`
+      ).asMilliseconds()).format(`H[h] m[m]`);
+
   return (
     `<section class="statistic">
       <p class="statistic__rank">
         Your rank
         <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-        <span class="statistic__rank-label">Sci-Fighter</span>
+        <span class="statistic__rank-label">${setProfileRank(totalWatchedFilms.length)}</span>
       </p>
 
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -177,7 +184,7 @@ const createStatisticsTemplate = (watchedFilms, watchedGenres, currentFilter, cu
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
-          <p class="statistic__item-text">${humanizeDuration(getTotalWatchedFilmsDuration(watchedFilms))}</p>
+          <p class="statistic__item-text">${totalDuration}</p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
@@ -222,17 +229,9 @@ export default class Statistics extends SmartView {
     this._setChart();
   }
 
-  removeElement() {
-    super.removeElement();
-
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-  }
-
   getTemplate() {
     return createStatisticsTemplate(
+        this._totalWatchedFilms,
         this._currentWatchedFilms,
         this._currentWatchedGenres,
         this._currentFilter,

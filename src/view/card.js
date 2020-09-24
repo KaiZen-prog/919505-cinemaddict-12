@@ -1,6 +1,6 @@
 import Abstract from "./abstract.js";
 import {MAX_DESCRIPTION_LENGTH, ClickableHTMLElements} from "../const.js";
-import {formatFilmReleaseYear, humanizeDuration} from "../utils/film.js";
+import moment from "moment";
 
 const createCard = (film) => {
   const {
@@ -45,16 +45,18 @@ const createCard = (film) => {
     ? `film-card__controls-item--active`
     : ``;
 
+  const releaseYear = moment(releaseDate).year();
+
   return (
     `<article data-id="${id}" class="film-card">
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
         <p class="film-card__info">
-            <span class="film-card__year">${formatFilmReleaseYear(releaseDate)}</span>
-            <span class="film-card__duration">${humanizeDuration(duration)}</span>
+            <span class="film-card__year">${releaseYear}</span>
+            <span class="film-card__duration">${duration}</span>
             <span class="film-card__genre">${genres}</span>
         </p>
-        <img src="./images/posters/${poster}"  alt="" class="film-card__poster">
+        <img src="./${poster}"  alt="" class="film-card__poster">
         <p class="film-card__description">${filmDescription}</p>
         <a class="film-card__comments">${commentsLinkTitle}</a>
         <form class="film-card__controls">

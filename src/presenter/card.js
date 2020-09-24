@@ -1,8 +1,13 @@
+import Api from "../api.js";
 import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType, CardMode} from "../const";
 
+const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2j`;
+const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict/`;
+
+const api = new Api(END_POINT, AUTHORIZATION);
 const INDEX_BODY = document.querySelector(`body`);
 
 export default class Card {
@@ -30,8 +35,12 @@ export default class Card {
     const prevFilmComponent = this._cardComponent;
     const prevFilmPopupComponent = this._popupComponent;
 
+    api.getComments(this._film)
+      .then((result) => {
+        this._popupComponent = new FilmPopupView(result);
+      });
+
     this._cardComponent = new CardView(this._film);
-    this._popupComponent = new FilmPopupView(this._film);
 
     this._cardComponent.setClickHandler(this._handlePopupOpenClick);
     this._cardComponent.setAddToWatchlistClickHandler(this._handleAddToWatchlistClick);
@@ -110,7 +119,10 @@ export default class Card {
   // Удаление и перезапуск
   destroy() {
     remove(this._cardComponent);
-    remove(this._popupComponent);
+
+    if (this._popupComponent !== null) {
+      remove(this._popupComponent);
+    }
   }
 
   resetView() {

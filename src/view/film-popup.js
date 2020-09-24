@@ -1,17 +1,15 @@
-import SmartView from "./smart.js";
-
 import he from "he";
 import moment from 'moment';
 
-import {formatFilmReleaseDate} from "../utils/film.js";
+import SmartView from "./smart.js";
 import {isEscapeDown} from "../utils/common";
-import {humanizeDuration} from "../utils/film";
 
 const createFilmPopup = (data) => {
   const {
     poster,
     ageLimit,
     title,
+    alternativeTitle,
     rating,
     director,
     writers,
@@ -93,7 +91,7 @@ const createFilmPopup = (data) => {
                 <img src="images/emoji/${comments[i].emoji}.png" width="55" height="55" alt="emoji-smile">
             </span>
             <div>
-                <p class="film-details__comment-text">${he.encode(comments[i].text)}</p>
+                <p class="film-details__comment-text">${he.encode(comments[i].comment)}</p>
                 <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${comments[i].author}</span>
                     <span class="film-details__comment-day">2019/12/31 23:59</span>
@@ -123,7 +121,7 @@ const createFilmPopup = (data) => {
             </div>
             <div class="film-details__info-wrap">
               <div class="film-details__poster">
-                <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
+                <img class="film-details__poster-img" src="./${poster}" alt="">
 
                 <p class="film-details__age">${ageLimit}+</p>
               </div>
@@ -132,7 +130,7 @@ const createFilmPopup = (data) => {
                 <div class="film-details__info-head">
                   <div class="film-details__title-wrap">
                     <h3 class="film-details__title">${title}</h3>
-                    <p class="film-details__title-original">Original: ${title}</p>
+                    <p class="film-details__title-original">Original: ${alternativeTitle}</p>
                   </div>
 
                   <div class="film-details__rating">
@@ -155,11 +153,11 @@ const createFilmPopup = (data) => {
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Release Date</td>
-                    <td class="film-details__cell">${formatFilmReleaseDate(releaseDate)}</td>
+                    <td class="film-details__cell">${releaseDate}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Runtime</td>
-                    <td class="film-details__cell">${humanizeDuration(duration)}</td>
+                    <td class="film-details__cell">${duration}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Country</td>
