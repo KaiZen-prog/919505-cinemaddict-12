@@ -50,8 +50,8 @@ export default class Films extends Observer {
       description: film.film_info.description,
       inWatchlist: film.user_details.watchlist,
       isWatched: film.user_details.already_watched,
-      isFavorite: film.user_details.favorite,
       watchingDate: moment(new Date(film.user_details.watching_date)).format(`YYYY/MM/DD`),
+      isFavorite: film.user_details.favorite,
       currentComment: {
         text: null,
         emotion: null,
@@ -94,55 +94,60 @@ export default class Films extends Observer {
 
   static adaptToServer(film) {
     const adaptedFilm = Object.assign({}, film, {
-      "film_info": Object.assign({}, {
-        "poster": film.poster,
-        "title": film.title,
-        "alternative_title": film.alternativeTitle,
-        "description": film.description,
-        "total_rating": film.totalRating,
-        "runtime": film.runtimeUnformated,
-        "genre": film.genre,
-        "age_rating": film.age,
-        "director": film.director,
-        "writers": film.writers,
-        "actors": film.actors,
-        "release": Object.assign({}, {
-          "release_country": film.country,
-          "date": film.releaseDateUnformated,
-        }),
-      }),
-      "user_details": Object.assign({}, {
-        "watchlist": film.isWatchlist,
-        "already_watched": film.isHistory,
-        "favorite": film.isFavorites,
-        "watching_date": film.watchingDateUnformated,
-      }),
       "comments": film.comments.map((comment) => {
         if (comment.id) {
           return comment.id;
         }
         return comment;
+      }),
+      "film_info": Object.assign({}, {
+        "title": film.title,
+        "alternative_title": film.alternativeTitle,
+        "total_rating": film.rating,
+        "poster": film.poster,
+        "age_rating": film.ageLimit,
+        "director": film.director,
+        "writers": film.writers,
+        "actors": film.actors,
+        "release": Object.assign({}, {
+          "date": film.releaseDateNotFormatted,
+          "release_country": film.country
+        }),
+        "runtime": film.durationNotFormatted,
+        "genre": film.genres,
+        "description": film.description,
+      }),
+      "user_details": Object.assign({}, {
+        "watchlist": film.inWatchlist,
+        "already_watched": film.isWatched,
+        "watching_date": film.watchingDateNotFormatted,
+        "favorite": film.isFavorite,
       })
     });
 
-    delete adaptedFilm.poster;
     delete adaptedFilm.title;
     delete adaptedFilm.alternativeTitle;
-    delete adaptedFilm.description;
-    delete adaptedFilm.totalRating;
-    delete adaptedFilm.runtime;
-    delete adaptedFilm.age;
+    delete adaptedFilm.rating;
+    delete adaptedFilm.poster;
+    delete adaptedFilm.ageLimit;
     delete adaptedFilm.director;
     delete adaptedFilm.writers;
     delete adaptedFilm.actors;
-    delete adaptedFilm.country;
     delete adaptedFilm.releaseDate;
-    delete adaptedFilm.isWatchlist;
-    delete adaptedFilm.isHistory;
-    delete adaptedFilm.isFavorites;
+    delete adaptedFilm.country;
+    delete adaptedFilm.duration;
+    delete adaptedFilm.genres;
+    delete adaptedFilm.description;
+    delete adaptedFilm.inWatchlist;
+    delete adaptedFilm.isWatched;
     delete adaptedFilm.watchingDate;
-    delete adaptedFilm.genre;
+    delete adaptedFilm.isFavorite;
+    delete adaptedFilm.watchingDate;
     delete adaptedFilm.currentComment;
+    delete adaptedFilm.watchingDateNotFormatted;
+    delete adaptedFilm.releaseDateNotFormatted;
+    delete adaptedFilm.durationNotFormatted;
+
     return adaptedFilm;
   }
 

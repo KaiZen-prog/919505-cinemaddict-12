@@ -45,15 +45,6 @@ const createFilmPopup = (data) => {
     return genresList + `</td>`;
   };
 
-  // Корректируем отображение часов и минут, если их меньше 10
-  const setTimeString = (timeString) => {
-    if (timeString < 10) {
-      timeString = `0` + timeString;
-    }
-
-    return timeString;
-  };
-
   // Активируем инпуты
   const isInWatchList = inWatchlist
     ? `checked`
@@ -71,20 +62,6 @@ const createFilmPopup = (data) => {
   const renderCommentsList = () => {
     let commentsList = ``;
     for (let i = 0; i < comments.length; i++) {
-      const date = new Date(comments[i].date);
-
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-      let hour = setTimeString(date.getUTCHours());
-      let minute = setTimeString(date.getMinutes());
-
-      if (minute === 0) {
-        minute = `0` + minute;
-      }
-
-      const commentDateString = year + `/` + month + `/` + day + ` ` + hour + `:` + minute;
-
       commentsList +=
         `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
@@ -94,8 +71,7 @@ const createFilmPopup = (data) => {
                 <p class="film-details__comment-text">${he.encode(comments[i].comment)}</p>
                 <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${comments[i].author}</span>
-                    <span class="film-details__comment-day">2019/12/31 23:59</span>
-                    <span class="film-details__comment-day">${commentDateString}</span>
+                    <span class="film-details__comment-day">${moment(comments[i].day, `YYYY/MM/DD HH:mm`).fromNow()}</span>
                     <button class="film-details__comment-delete" data-comment-number="${comments[i].id}-${i}">Delete</button>
                 </p>
             </div>
@@ -305,7 +281,7 @@ export default class FilmPopup extends SmartView {
     if ((evt.ctrlKey || evt.metaKey) && (evt.keyCode === 13 || evt.keyCode === 10)) {
       evt.preventDefault();
       const newComment = Object.assign({}, this._data.currentComment, {
-        text: evt.target.value,
+        comment: evt.target.value,
         author: `Current User`,
         date: moment().format(`YYYY/MM/DD HH:mm`)
       });

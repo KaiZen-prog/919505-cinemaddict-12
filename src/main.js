@@ -17,7 +17,7 @@ const INDEX_MAIN = document.querySelector(`.main`);
 const FILMS_QUANTITY_SECTION = document.querySelector(`.footer__statistics`);
 
 const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2j`;
-const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict/`;
+const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -29,10 +29,9 @@ const mainNavigationSectionComponent = new MainNavigationSection();
 let menuButtonComponent = new MenuButtonView(MenuItem.STATISTICS);
 
 render(INDEX_MAIN, mainNavigationSectionComponent, RenderPosition.AFTERBEGIN);
-render(mainNavigationSectionComponent, menuButtonComponent, RenderPosition.BEFOREEND);
 
 // Инициализация презентеров
-const boardPresenter = new BoardPresenter(INDEX_MAIN, filmsModel, filterModel);
+const boardPresenter = new BoardPresenter(INDEX_MAIN, filmsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(mainNavigationSectionComponent, filmsModel, filterModel);
 
 boardPresenter.init();
@@ -42,10 +41,14 @@ api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
     render(FILMS_QUANTITY_SECTION, new CardsQuantityView(filmsModel.getFilms().length), RenderPosition.BEFOREEND);
+    render(mainNavigationSectionComponent, menuButtonComponent, RenderPosition.BEFOREEND);
+    menuButtonComponent.setMenuClickHandler(handleStatButtonClick);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
     render(FILMS_QUANTITY_SECTION, new CardsQuantityView(0), RenderPosition.BEFOREEND);
+    render(mainNavigationSectionComponent, menuButtonComponent, RenderPosition.BEFOREEND);
+    menuButtonComponent.setMenuClickHandler(handleStatButtonClick);
   });
 
 
@@ -69,7 +72,6 @@ const handleStatButtonClick = (menuItem) => {
 };
 
 let statisticsComponent = null;
-menuButtonComponent.setMenuClickHandler(handleStatButtonClick);
 
 // Обновление кнопки меню при смене экрана
 const resetMenuButton = (menuItem) => {

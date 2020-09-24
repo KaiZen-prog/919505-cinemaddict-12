@@ -13,18 +13,16 @@ const CURRENT_DATE = new Date();
 const renderChart = (ctx, watchedGenres) => {
   const BAR_HEIGHT = 50;
 
-  const watchedGenresLabels = [];
-  for (let genre in watchedGenres) {
-    if (watchedGenres.hasOwnProperty(genre)) {
-      watchedGenresLabels.push(genre);
-    }
-  }
+
+  // Сортируем жанры по числу просмотров
+  const sortedGenreTitles = Object.keys(watchedGenres)
+    .sort(function (a, b) {
+      return watchedGenres[b] - watchedGenres[a];
+    });
 
   const watchedGenresCounts = [];
-  for (let genre in watchedGenres) {
-    if (watchedGenres.hasOwnProperty(genre)) {
-      watchedGenresCounts.push(watchedGenres[genre].timesWatched);
-    }
+  for (let i = 0; i < sortedGenreTitles.length; i++) {
+    watchedGenresCounts.push(watchedGenres[sortedGenreTitles[i]]);
   }
 
   ctx.height = BAR_HEIGHT * 5;
@@ -33,7 +31,7 @@ const renderChart = (ctx, watchedGenres) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: watchedGenresLabels,
+      labels: sortedGenreTitles,
       datasets: [{
         data: watchedGenresCounts,
         backgroundColor: `#ffe800`,
@@ -94,8 +92,8 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
     let favoriteGenre = ``;
 
     for (let genre in watchedGenres) {
-      if (watchedGenres[genre].timesWatched > max) {
-        max = genre.timesWatched;
+      if (watchedGenres[genre] > max) {
+        max = watchedGenres[genre];
         favoriteGenre = genre;
       }
     }
@@ -251,12 +249,10 @@ export default class Statistics extends SmartView {
     films.forEach((film) => {
       film.genres.forEach((genre) => {
         if (!watchedGenres[genre]) {
-          watchedGenres[genre] = Object.assign({}, {
-            timesWatched: 1
-          });
+          watchedGenres[genre] = 1;
           this._currentWatchedGenresCount++;
         } else {
-          watchedGenres[genre].timesWatched++;
+          watchedGenres[genre]++;
         }
       });
     });

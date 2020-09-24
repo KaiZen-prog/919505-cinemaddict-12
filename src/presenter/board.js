@@ -35,10 +35,12 @@ import CardPresenter from "./card.js";
 const INDEX_HEADER = document.querySelector(`.header`);
 
 export default class Board {
-  constructor(container, cardModel, filterModel) {
+  constructor(container, cardModel, filterModel, api) {
     this._cardModel = cardModel;
     this._filterModel = filterModel;
     this._mainContainerComponent = container;
+    this._api = api;
+
     this._currentSortType = SortingEntries.DEFAULT;
     this._renderedCardCount = CARDS_COUNT_PER_STEP;
     this._isLoading = true;
@@ -117,7 +119,9 @@ export default class Board {
   _handleViewAction(actionType, updateType, updatedFilm) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._cardModel.updateFilm(updateType, updatedFilm);
+        this._api.updateFilm(updatedFilm).then((response) => {
+          this._cardModel.updateFilm(updateType, response);
+        });
         break;
     }
   }
