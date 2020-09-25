@@ -241,8 +241,8 @@ export default class Board {
   // Сортируем фильмы по дате выхода
   _sortFilmsByReleaseDate(films) {
     return films.slice().sort((left, right) => {
-      let dateRight = moment(right.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
-      let dateLeft = moment(left.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
+      const dateRight = moment(right.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
+      const dateLeft = moment(left.releaseDate, `DD MMMM YYYY`).format(`YYYYMMDD`);
       let rankDiff = dateRight - dateLeft;
 
       if (rankDiff === 0) {

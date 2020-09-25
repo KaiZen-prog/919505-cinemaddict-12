@@ -90,7 +90,7 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
     let max = 0;
     let favoriteGenre = ``;
 
-    for (let genre in watchedGenres) {
+    for (const genre in watchedGenres) {
       if (watchedGenres[genre] > max) {
         max = watchedGenres[genre];
         favoriteGenre = genre;
@@ -124,7 +124,7 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
   const generateInputs = () => {
     let inputs = ``;
 
-    for (let statFilter in StatisticsFilters) {
+    for (const statFilter in StatisticsFilters) {
       if (StatisticsFilters.hasOwnProperty(statFilter)) {
         const isChecked = () => {
           let string = ``;
@@ -156,8 +156,8 @@ const createStatisticsTemplate = (totalWatchedFilms, watchedFilms, watchedGenres
   };
 
   const formattedDuration = (minutes) => {
-    let hrs = Math.trunc(minutes / 60);
-    let mins = minutes % 60;
+    const hrs = Math.trunc(minutes / 60);
+    const mins = minutes % 60;
     return hrs + `h ` + mins + `m`;
   };
 
@@ -201,19 +201,19 @@ export default class Statistics extends SmartView {
     this._totalWatchedGenres = this._getWatchedGenres(this._totalWatchedFilms);
 
     // Фильмы за прошедший год
-    let yearBefore = new Date().setFullYear(new Date().getFullYear() - 1);
+    const yearBefore = new Date().setFullYear(new Date().getFullYear() - 1);
     this._filmsWatchedLastYear = getWatchedFilmsInDateRange(this._totalWatchedFilms, yearBefore, CURRENT_DATE);
 
     // Фильмы за прошедший месяц
-    let monthBefore = new Date().setMonth(new Date().getMonth() - 1);
+    const monthBefore = new Date().setMonth(new Date().getMonth() - 1);
     this._filmsWatchedLastMonth = getWatchedFilmsInDateRange(this._totalWatchedFilms, monthBefore, CURRENT_DATE);
 
     // Фильмы за прошедшую неделю
-    let weekBefore = new Date().setDate(new Date().getDate() - 7);
+    const weekBefore = new Date().setDate(new Date().getDate() - 7);
     this._filmsWatchedLastWeek = getWatchedFilmsInDateRange(this._totalWatchedFilms, weekBefore, CURRENT_DATE);
 
     // Фильмы за прошедшие сутки
-    let dayBefore = new Date().setDate(new Date().getDate() - 1);
+    const dayBefore = new Date().setDate(new Date().getDate() - 1);
     this._filmsWatchedToday = getWatchedFilmsInDateRange(this._totalWatchedFilms, dayBefore, CURRENT_DATE);
 
     this._currentFilter = StatisticsFilters.ALL_TIME;

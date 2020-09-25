@@ -14,7 +14,7 @@ const toggleFilmsQuantity = (count, filter) =>
 const createFilterItemTemplate = (filter, currentFilter) => {
   const {type, count} = filter;
 
-  let isActive = toggleClassName(type, currentFilter);
+  const isActive = toggleClassName(type, currentFilter);
   return (
     `<a href="#${filter}" class="main-navigation__item${isActive}" data-filter="${type}">
             ${type}${toggleFilmsQuantity(count, type)}
