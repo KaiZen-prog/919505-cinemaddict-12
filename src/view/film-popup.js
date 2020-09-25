@@ -1,8 +1,7 @@
 import he from "he";
 import moment from 'moment';
-
+import {isEscapeDown, isCtrlEnterDown} from "../utils/common";
 import SmartView from "./smart.js";
-import {isEscapeDown} from "../utils/common";
 
 const createFilmPopup = (data) => {
   const {
@@ -278,7 +277,7 @@ export default class FilmPopup extends SmartView {
   }
 
   _addCommentHandler(evt) {
-    if ((evt.ctrlKey || evt.metaKey) && (evt.keyCode === 13 || evt.keyCode === 10)) {
+    if (isCtrlEnterDown(evt)) {
       evt.preventDefault();
       const newComment = Object.assign({}, this._data.currentComment, {
         comment: evt.target.value,

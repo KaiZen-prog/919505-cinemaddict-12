@@ -1,4 +1,13 @@
+import {nanoid} from "nanoid";
+
+export const BackendValues = {
+  AUTHORIZATION: `Basic ` + nanoid(),
+  END_POINT: `https://12.ecmascript.pages.academy/cinemaddict`
+};
+
 export const KEY_CODE_ESCAPE = 27;
+export const KEY_CODE_CTRL = 13;
+export const KEY_CODE_ENTER = 10;
 
 export const CARDS_COUNT_PER_STEP = 5;
 export const SPECIAL_CARDS_COUNT = 2;
@@ -77,9 +86,4 @@ export const StatisticsLabels = {
   WEEK: `Week`,
   MONTH: `Month`,
   YEAR: `Year`
-};
-
-export const BackendValues = {
-  AUTHORIZATION: `Basic hS2sd3dfSwcl1sa2j`,
-  END_POINT: `https://12.ecmascript.pages.academy/cinemaddict`
 };
