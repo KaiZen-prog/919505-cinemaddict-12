@@ -1,4 +1,3 @@
-
 import Abstract from './abstract';
 
 export default class NoFilms extends Abstract {
