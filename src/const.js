@@ -5,6 +5,12 @@ export const BackendValues = {
   END_POINT: `https://12.ecmascript.pages.academy/cinemaddict`
 };
 
+export const StoreValues = {
+  STORE_PREFIX: `cinemaddict-localstorage`,
+  STORE_VER: `v12`,
+  STORE_NAME: `${StoreValues.STORE_PREFIX}-${StoreValues.STORE_VER}`
+};
+
 export const KEY_CODE_ESCAPE = 27;
 export const KEY_CODE_CTRL = 13;
 export const KEY_CODE_ENTER = 10;
@@ -17,6 +23,11 @@ export const ClickableHTMLElements = {
   IMG: `IMG`,
   H3: `H3`,
   A: `A`
+};
+
+export const DeleteCommentButtonLabels = {
+  DEFAULT: `Delete`,
+  ONCLICK: `Deleting...`
 };
 
 export const SortingEntries = {

@@ -1,4 +1,4 @@
-import Api from "../api.js";
+import Api from "../api/index.js";
 import CardView from "../view/card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";

@@ -1,6 +1,7 @@
 import he from "he";
 import moment from 'moment';
-import {isEscapeDown, isCtrlEnterDown} from "../utils/common";
+import {DeleteCommentButtonLabels} from "../const.js";
+import {isEscapeDown, isCtrlEnterDown} from "../utils/common.js";
 import SmartView from "./smart.js";
 
 const createFilmPopup = (data) => {
@@ -71,7 +72,7 @@ const createFilmPopup = (data) => {
                 <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${comments[i].author}</span>
                     <span class="film-details__comment-day">${moment(comments[i].day, `YYYY/MM/DD HH:mm`).fromNow()}</span>
-                    <button class="film-details__comment-delete" data-comment-number="${comments[i].id}-${i}">Delete</button>
+                    <button class="film-details__comment-delete" data-comment-number="${comments[i].id}-${i}">${DeleteCommentButtonLabels.DEFAULT}</button>
                 </p>
             </div>
         </li>`;
@@ -295,7 +296,7 @@ export default class FilmPopup extends SmartView {
     evt.preventDefault();
     this.deleteComment(evt.target.dataset.commentNumber);
     evt.target.setAttribute(`disabled`, `disabled`);
-    evt.target.innerText = `Deleting...`;
+    evt.target.innerText = DeleteCommentButtonLabels.ONCLICK;
   }
 
   _closePopupClickHandler(evt) {

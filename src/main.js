@@ -1,7 +1,10 @@
-import {MenuItem, UpdateType, FilterType, BackendValues} from "./const.js";
+import {MenuItem, UpdateType, FilterType, BackendValues, StoreValues} from "./const.js";
 import {render, RenderPosition, remove} from "./utils/render.js";
 
-import Api from "./api.js";
+import Api from "./api/index.js";
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
+
 import FilmsModel from "./model/films.js";
 import FilterModel from "./model/filter.js";
 
@@ -17,6 +20,8 @@ const INDEX_MAIN = document.querySelector(`.main`);
 const FILMS_QUANTITY_SECTION = document.querySelector(`.footer__statistics`);
 
 const api = new Api(BackendValues.END_POINT, BackendValues.AUTHORIZATION);
+const store = new Store(StoreValues.STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const filmsModel = new FilmsModel();
 const filterModel = new FilterModel();
@@ -28,13 +33,13 @@ let menuButtonComponent = new MenuButtonView(MenuItem.STATISTICS);
 render(INDEX_MAIN, mainNavigationSectionComponent, RenderPosition.AFTERBEGIN);
 
 // Инициализация презентеров
-const boardPresenter = new BoardPresenter(INDEX_MAIN, filmsModel, filterModel, api);
+const boardPresenter = new BoardPresenter(INDEX_MAIN, filmsModel, filterModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(mainNavigationSectionComponent, filmsModel, filterModel);
 
 boardPresenter.init();
 filterPresenter.init();
 
-api.getFilms()
+apiWithProvider.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
     render(FILMS_QUANTITY_SECTION, new CardsQuantityView(filmsModel.getFilms().length), RenderPosition.BEFOREEND);
@@ -77,3 +82,17 @@ const resetMenuButton = (menuItem) => {
   render(mainNavigationSectionComponent, menuButtonComponent, RenderPosition.BEFOREEND);
   menuButtonComponent.setMenuClickHandler(handleStatButtonClick);
 };
+
+// ServiceWorker
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`./sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});

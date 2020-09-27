@@ -1,5 +1,5 @@
 import Abstract from "./abstract";
-import Api from "../api.js";
+import Api from "../api/index";
 import {BackendValues} from "../const";
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
